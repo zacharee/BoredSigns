@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">BoredSigns</string>
+
+    <!--Widget Titles-->
+    <string name="info_widget_title">Information Screen</string>
+
+    <!--Preference Titles-->
+    <string name="battery_color_title">Battery Color</string>
+</resources>

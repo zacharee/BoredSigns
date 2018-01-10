@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        android:title="Clock">
+
+        <SwitchPreference
+            android:title="Show AM/PM"
+            android:key="am_pm"
+            android:defaultValue="true" />
+
+        <SwitchPreference
+            android:title="24-Hour Time"
+            android:key="24_hour" />
+
+        <SwitchPreference
+            android:title="Show Date"
+            android:key="show_date" />
+
+        <com.jaredrummler.android.colorpicker.ColorPreference
+            android:title="Clock Color"
+            android:defaultValue="-1"
+            android:key="clock_color" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Battery">
+
+        <SwitchPreference
+            android:title="Show Percentage"
+            android:defaultValue="true"
+            android:key="show_percent" />
+
+        <com.jaredrummler.android.colorpicker.ColorPreference
+            android:title="@string/battery_color_title"
+            android:defaultValue="-1"
+            android:key="battery_color" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

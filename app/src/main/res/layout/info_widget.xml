@@ -1,0 +1,23 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="1040px"
+    android:layout_height="160px">
+
+    <include
+        android:id="@+id/battery"
+        layout="@layout/battery_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_toLeftOf="@+id/clock"
+        android:layout_gravity="right" />
+
+    <include
+        android:id="@+id/clock"
+        layout="@layout/clock_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="right" />
+
+</RelativeLayout>
