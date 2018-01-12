@@ -47,13 +47,22 @@ class InfoWidget : AppWidgetProvider() {
 
     private var mPrefs: SharedPreferences? = null
 
+    private var mOldRanking: NotificationListenerService.RankingMap? = null
+
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         mPrefs = PreferenceManager.getDefaultSharedPreferences(context)
         mBatteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
 
-        for (appWidgetId in appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId)
-        }
+        val views = RemoteViews(context.packageName, R.layout.info_widget)
+
+        updateBattery(views)
+        updateClock(views)
+        updateMobile(views, context, appWidgetManager, appWidgetIds)
+        updateWifi(views, context)
+        updateNotifications(views)
+
+        // Instruct the widget manager to update the widget
+        appWidgetManager.updateAppWidget(appWidgetIds, views)
     }
 
     override fun onRestored(context: Context?, oldWidgetIds: IntArray?, newWidgetIds: IntArray?) {
@@ -65,49 +74,35 @@ class InfoWidget : AppWidgetProvider() {
     override fun onReceive(context: Context?, intent: Intent?) {
         val rank = intent?.getBooleanExtra(InfoService.RANKING_LIST, false)
 
-        rank?.let {
-            if (it) InfoService.RANKING?.let {
-                mRankedNotifs.clear()
+        rank?.let { if (it) InfoService.RANKING?.let {
+                if (mOldRanking == null || !Arrays.equals(mOldRanking?.orderedKeys, it.orderedKeys)) {
+                    mOldRanking = it
+                    mRankedNotifs.clear()
 
-                for (ranking in it.orderedKeys) {
-                    val stuff = ranking.split("|")
-                    val state = NotificationState(context, stuff[1], stuff[0].toInt())
+                    for (ranking in it.orderedKeys) {
+                        val stuff = ranking.split("|")
+                        val state = NotificationState(context, stuff[1], stuff[0].toInt())
 
-                    InfoService.NOTIFS?.let {
-                        for (notif in it) {
-                            if (stuff[1] == notif?.packageName) {
-                                if (notif.isOngoing) {
-                                    state.show = false
+                        InfoService.NOTIFS?.let {
+                            for (notif in it) {
+                                if (stuff[1] == notif?.packageName) {
+                                    if (notif.isOngoing) {
+                                        state.show = false
+                                    }
+                                    state.icon = notif.notification.smallIcon.loadDrawable(context)
                                 }
-                                state.icon = notif.notification.smallIcon.loadDrawable(context)
                             }
                         }
-                    }
 
-                    if (!mRankedNotifs.contains(state) && state.show) {
-                        mRankedNotifs.add(state)
+                        if (!mRankedNotifs.contains(state) && state.show) {
+                            mRankedNotifs.add(state)
+                        }
                     }
                 }
             }
         }
 
         super.onReceive(context, intent)
-    }
-
-    private fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager,
-                                appWidgetId: Int) {
-
-        // Construct the RemoteViews object
-        val views = RemoteViews(context.packageName, R.layout.info_widget)
-
-        updateBattery(views)
-        updateClock(views)
-        updateMobile(views, context, appWidgetManager, appWidgetId)
-        updateWifi(views, context)
-        updateNotifications(views)
-
-        // Instruct the widget manager to update the widget
-        appWidgetManager.updateAppWidget(appWidgetId, views)
     }
 
     private fun updateBattery(views: RemoteViews) {
@@ -173,7 +168,7 @@ class InfoWidget : AppWidgetProvider() {
         }
     }
 
-    private fun updateMobile(views: RemoteViews, context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
+    private fun updateMobile(views: RemoteViews, context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         var show = true
         var color = Color.WHITE
 
@@ -219,7 +214,7 @@ class InfoWidget : AppWidgetProvider() {
                     mMobileState.updateState(level, connected)
                     views.setImageViewResource(R.id.mobile_view, mMobileState.imageResource)
 
-                    appWidgetManager.updateAppWidget(appWidgetId, views)
+                    appWidgetManager.updateAppWidget(appWidgetIds, views)
                 }
             }, PhoneStateListener.LISTEN_SERVICE_STATE)
 

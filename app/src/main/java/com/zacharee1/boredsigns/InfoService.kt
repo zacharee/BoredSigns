@@ -30,10 +30,6 @@ class InfoService : NotificationListenerService() {
         val NOTIF_BASE = "com.zacharee1.boredsigns.action."
         val NOTIF_UPDATE = NOTIF_BASE + "NOTIF_UPDATE"
 
-        val NOTIF_ADD = "NOTIF_ADD"
-        val NOTIF_REM = "NOTIF_REMOVE"
-        val NOTIF_RANK = "NOTIF_RANK"
-
         val NOTIF_LIST = "notifs"
         val RANKING_LIST = "ranks"
 
@@ -93,19 +89,16 @@ class InfoService : NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         val extras = Bundle()
-        extras.putParcelable(NOTIF_ADD, sbn)
         sendUpdateBroadcast(extras)
     }
 
     override fun onNotificationRankingUpdate(rankingMap: RankingMap?) {
         val extras = Bundle()
-        extras.putParcelable(NOTIF_RANK, rankingMap)
         sendUpdateBroadcast(extras)
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification?) {
         val extras = Bundle()
-        extras.putParcelable(NOTIF_REM, sbn)
         sendUpdateBroadcast(extras)
     }
 

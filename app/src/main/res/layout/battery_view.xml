@@ -10,11 +10,11 @@
 
     <ImageView
         android:id="@+id/battery_view"
-        android:layout_width="70px"
+        android:layout_width="90px"
         android:layout_height="0dp"
         android:layout_gravity="center"
         android:layout_weight="1"
-        android:scaleType="centerCrop"
+        android:scaleType="fitCenter"
         android:tint="#fff"
         app:srcCompat="@drawable/ic_battery_alert_black_24dp" />
 
