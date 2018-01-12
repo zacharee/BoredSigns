@@ -1,0 +1,1 @@
+This app uses the READ_PHONE_STATE permission. It DOES NOT collect any user data, such as phone numbers, contact names or SMS. This permission is needed only to observe the current cellular signal strength and data type for the Information widget.
