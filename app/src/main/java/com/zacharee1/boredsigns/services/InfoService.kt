@@ -1,9 +1,7 @@
-package com.zacharee1.boredsigns
+package com.zacharee1.boredsigns.services
 
 import android.app.Notification
-import android.app.Service
 import android.content.*
-import android.os.IBinder
 import android.preference.PreferenceManager
 import com.zacharee1.boredsigns.widgets.InfoWidget
 import android.appwidget.AppWidgetManager
@@ -11,7 +9,6 @@ import android.content.Intent
 import android.content.ComponentName
 import android.net.ConnectivityManager
 import android.net.wifi.WifiManager
-import android.os.Binder
 import android.os.Bundle
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
@@ -19,7 +16,6 @@ import android.telephony.PhoneStateListener
 import android.telephony.SignalStrength
 import android.telephony.TelephonyManager
 import android.util.Log
-import java.util.*
 
 
 class InfoService : NotificationListenerService() {
@@ -68,14 +64,14 @@ class InfoService : NotificationListenerService() {
     private var mPrefsListener: SharedPreferences.OnSharedPreferenceChangeListener? = SharedPreferences.OnSharedPreferenceChangeListener {
         _, s ->
 
-        if (KEYS.contains(s)) {
+        if (KEYS.contains(s) && shouldAct()) {
             sendUpdateBroadcast(null)
         }
     }
 
     private var mReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(p0: Context?, p1: Intent?) {
-            if (INTENTS.contains(p1?.action)) {
+            if (INTENTS.contains(p1?.action) && shouldAct()) {
                 sendUpdateBroadcast(p1?.extras)
             }
         }
@@ -83,33 +79,30 @@ class InfoService : NotificationListenerService() {
 
     private var mTelephonyListener: PhoneStateListener = object : PhoneStateListener() {
         override fun onSignalStrengthsChanged(signalStrength: SignalStrength?) {
-            sendUpdateBroadcast(null)
+            if (shouldAct()) sendUpdateBroadcast(null)
         }
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
-        val extras = Bundle()
-        sendUpdateBroadcast(extras)
+        if (shouldAct()) sendUpdateBroadcast(null)
     }
 
     override fun onNotificationRankingUpdate(rankingMap: RankingMap?) {
-        val extras = Bundle()
-        sendUpdateBroadcast(extras)
+        if (shouldAct()) sendUpdateBroadcast(null)
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification?) {
-        val extras = Bundle()
-        sendUpdateBroadcast(extras)
+        if (shouldAct()) sendUpdateBroadcast(null)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startForeground(1337, Notification())
-
         return START_STICKY
     }
 
     override fun onCreate() {
         super.onCreate()
+
+        startForeground(1337, Notification())
 
         val filter = IntentFilter()
         for (s in INTENTS) {
@@ -121,7 +114,7 @@ class InfoService : NotificationListenerService() {
 
         (getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager).listen(mTelephonyListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS)
 
-        sendUpdateBroadcast(null)
+        if (shouldAct()) sendUpdateBroadcast(null)
     }
 
     override fun onListenerConnected() {
@@ -129,14 +122,16 @@ class InfoService : NotificationListenerService() {
 
         mConnected = true
 
-        RANKING = currentRanking
-        NOTIFS = activeNotifications
+        if (shouldAct()) {
+            RANKING = currentRanking
+            NOTIFS = activeNotifications
 
-        val extras = Bundle()
-        extras.putBoolean(RANKING_LIST, true)
-        extras.putBoolean(NOTIF_LIST, true)
+            val extras = Bundle()
+            extras.putBoolean(RANKING_LIST, true)
+            extras.putBoolean(NOTIF_LIST, true)
 
-        sendUpdateBroadcast(extras)
+            sendUpdateBroadcast(extras)
+        }
     }
 
     override fun onListenerDisconnected() {
@@ -150,6 +145,12 @@ class InfoService : NotificationListenerService() {
 
         unregisterReceiver(mReceiver)
         PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(mPrefsListener)
+    }
+
+    private fun shouldAct(): Boolean {
+        val man = AppWidgetManager.getInstance(this)
+        val ids = man.getAppWidgetIds(ComponentName(this, InfoWidget::class.java))
+        return ids != null && ids.isNotEmpty()
     }
 
     private fun sendUpdateBroadcast(extras: Bundle?) {

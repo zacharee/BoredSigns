@@ -17,10 +17,14 @@
         <activity android:name=".ConfigActivity" />
         <activity android:name=".proxies.InfoProxy">
             <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".activities.PermissionsActivity"
+            android:excludeFromRecents="true"
+            android:theme="@style/AppTheme.Null"/>
 
         <receiver
             android:name=".widgets.InfoWidget"
@@ -33,17 +37,18 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/info_widget_info" />
-            <meta-data android:name="com.lge.signboard.widget.description"
-                android:value="info_widget_title"/>
+            <meta-data
+                android:name="com.lge.signboard.widget.description"
+                android:value="info_widget_title" />
         </receiver>
 
         <service
-            android:name=".InfoService"
+            android:name=".services.InfoService"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
             <intent-filter>
-                <action android:name="android.service.notification.NotificationListenerService"/>
+                <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
     </application>

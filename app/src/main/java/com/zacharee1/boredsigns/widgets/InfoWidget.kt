@@ -1,8 +1,8 @@
 package com.zacharee1.boredsigns.widgets
 
 import android.Manifest
+import android.app.ActivityManager
 import android.app.Notification
-import android.app.NotificationManager
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.*
@@ -13,34 +13,24 @@ import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.Icon
-import android.net.ConnectivityManager
 import android.net.wifi.SupplicantState
 import android.net.wifi.WifiManager
 import android.os.BatteryManager
-import android.os.Bundle
-import android.os.IBinder
 import android.preference.PreferenceManager
 import android.provider.Settings
 import android.service.notification.NotificationListenerService
-import android.service.notification.StatusBarNotification
 import android.telephony.*
-import android.util.Log
-import android.util.SparseArray
 import android.view.View
-import android.widget.ImageView
 import android.widget.RemoteViews
-import com.zacharee1.boredsigns.InfoService
+import com.zacharee1.boredsigns.services.InfoService
 
 import com.zacharee1.boredsigns.R
+import com.zacharee1.boredsigns.activities.PermissionsActivity
 import java.util.*
 
 class InfoWidget : AppWidgetProvider() {
-
-    private var mBatteryManager: BatteryManager? = null
-
     private var mBatteryState: BatteryState = BatteryState(0, false)
-    private var mMobileState: MobileSignalState = MobileSignalState(-1, false)
+    private var mMobileState: MobileSignalState = MobileSignalState(-1, false, "")
     private var mWiFiState: WiFiSignalState = WiFiSignalState(-1)
 
     private var mRankedNotifs = ArrayList<NotificationState>()
@@ -50,12 +40,20 @@ class InfoWidget : AppWidgetProvider() {
     private var mOldRanking: NotificationListenerService.RankingMap? = null
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+        for (perm in PermissionsActivity.REQUEST) {
+            if (context.checkCallingOrSelfPermission(perm) != PackageManager.PERMISSION_GRANTED) {
+                val intent = Intent(context, PermissionsActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                context.startActivity(intent)
+                return
+            }
+        }
+
         mPrefs = PreferenceManager.getDefaultSharedPreferences(context)
-        mBatteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
 
         val views = RemoteViews(context.packageName, R.layout.info_widget)
 
-        updateBattery(views)
+        updateBattery(views, context)
         updateClock(views)
         updateMobile(views, context, appWidgetManager, appWidgetIds)
         updateWifi(views, context)
@@ -105,9 +103,11 @@ class InfoWidget : AppWidgetProvider() {
         super.onReceive(context, intent)
     }
 
-    private fun updateBattery(views: RemoteViews) {
-        val level = mBatteryManager?.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
-        val charging = mBatteryManager?.isCharging
+    private fun updateBattery(views: RemoteViews, context: Context) {
+        val intent = context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        val plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)
+        val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0)
+        val charging = plugged == BatteryManager.BATTERY_PLUGGED_AC || plugged == BatteryManager.BATTERY_PLUGGED_USB || plugged == BatteryManager.BATTERY_PLUGGED_WIRELESS
 
         var show = true
         var color = Color.WHITE
@@ -120,7 +120,7 @@ class InfoWidget : AppWidgetProvider() {
         }
 
         if (show) {
-            mBatteryState.updateState(level as Int, charging as Boolean)
+            mBatteryState.updateState(level, charging)
 
             views.setViewVisibility(R.id.battery, View.VISIBLE)
             views.setImageViewResource(R.id.battery_view, mBatteryState.imageResource)
@@ -181,6 +181,7 @@ class InfoWidget : AppWidgetProvider() {
             val telephony = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
             var level = 0
             var connected = false
+            var text = getNetworkTypeString(context)
             val airplane = Settings.Global.getInt(context.contentResolver, Settings.Global.AIRPLANE_MODE_ON, 0) != 0
 
             val hasSim = telephony.simState != TelephonyManager.SIM_STATE_ABSENT
@@ -211,8 +212,9 @@ class InfoWidget : AppWidgetProvider() {
                     else if (!hasSim) level = -2
                     else if (!hasService) level = -1
 
-                    mMobileState.updateState(level, connected)
+                    mMobileState.updateState(level, connected, text)
                     views.setImageViewResource(R.id.mobile_view, mMobileState.imageResource)
+                    views.setTextViewText(R.id.mobile_text, mMobileState.type)
 
                     appWidgetManager.updateAppWidget(appWidgetIds, views)
                 }
@@ -220,6 +222,7 @@ class InfoWidget : AppWidgetProvider() {
 
             views.setViewVisibility(R.id.mobile, View.VISIBLE)
             views.setInt(R.id.mobile_view, "setColorFilter", color)
+            views.setTextColor(R.id.mobile_text, color)
         } else {
             views.setViewVisibility(R.id.mobile, View.GONE)
         }
@@ -311,6 +314,33 @@ class InfoWidget : AppWidgetProvider() {
         return bitmap
     }
 
+    private fun getNetworkTypeString(context: Context): String {
+        val telMan = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+
+        when (telMan.networkType) {
+            TelephonyManager.NETWORK_TYPE_1xRTT -> return "1x"
+            TelephonyManager.NETWORK_TYPE_CDMA -> return "IS95"
+            TelephonyManager.NETWORK_TYPE_EDGE -> return "E"
+            TelephonyManager.NETWORK_TYPE_EHRPD -> return "3G"
+            TelephonyManager.NETWORK_TYPE_EVDO_0 -> return "3G"
+            TelephonyManager.NETWORK_TYPE_EVDO_A -> return "3G"
+            TelephonyManager.NETWORK_TYPE_EVDO_B -> return "3G"
+            TelephonyManager.NETWORK_TYPE_GPRS -> return "G"
+            TelephonyManager.NETWORK_TYPE_GSM -> return "2G"
+            TelephonyManager.NETWORK_TYPE_HSDPA -> return "H"
+            TelephonyManager.NETWORK_TYPE_HSPA -> return "H"
+            TelephonyManager.NETWORK_TYPE_HSPAP -> return "H+"
+            TelephonyManager.NETWORK_TYPE_HSUPA -> return "H"
+            TelephonyManager.NETWORK_TYPE_IDEN -> return "IDEN"
+            TelephonyManager.NETWORK_TYPE_IWLAN -> return "IWLAN"
+            TelephonyManager.NETWORK_TYPE_LTE -> return "LTE"
+            TelephonyManager.NETWORK_TYPE_TD_SCDMA -> return "3G"
+            TelephonyManager.NETWORK_TYPE_UMTS -> return "3G"
+            TelephonyManager.NETWORK_TYPE_UNKNOWN -> return ""
+            else -> return ""
+        }
+    }
+
     class BatteryState(percentage: Int, charging: Boolean) {
         var percent = 0
         var isCharging = false
@@ -344,18 +374,20 @@ class InfoWidget : AppWidgetProvider() {
         }
     }
 
-    class MobileSignalState(level: Int, connected: Boolean) {
+    class MobileSignalState(level: Int, connected: Boolean, type: String) {
         var level = -1
         var connected = false
         var imageResource = R.drawable.ic_signal_cellular_null_black_24dp
+        var type = ""
 
         init {
-            updateState(level, connected)
+            updateState(level, connected, type)
         }
 
-        fun updateState(level: Int, connected: Boolean) {
+        fun updateState(level: Int, connected: Boolean, type: String) {
             this.level = level
             this.connected = connected
+            this.type = type
 
             when (level) {
                 -3 -> imageResource = R.drawable.ic_airplanemode_active_black_24dp
