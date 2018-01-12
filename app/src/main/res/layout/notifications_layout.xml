@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center_vertical"
+    android:gravity="center_vertical"
+    android:padding="2dp">
+
+    <LinearLayout
+        android:id="@+id/notifications_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/notif_icon_0"
+            android:layout_width="70px"
+            android:layout_height="70px"
+            android:tintMode="multiply"
+            android:layout_gravity="center_vertical"/>
+
+        <ImageView
+            android:id="@+id/notif_icon_1"
+            android:layout_width="70px"
+            android:layout_height="70px"
+            android:tintMode="multiply"
+            android:layout_gravity="center_vertical"/>
+
+        <ImageView
+            android:id="@+id/notif_icon_2"
+            android:layout_width="70px"
+            android:layout_height="70px"
+            android:tintMode="multiply"
+            android:layout_gravity="center_vertical"/>
+
+        <ImageView
+            android:id="@+id/notif_icon_3"
+            android:layout_width="70px"
+            android:layout_height="70px"
+            android:tintMode="multiply"
+            android:layout_gravity="center_vertical"/>
+
+        <ImageView
+            android:id="@+id/notif_icon_4"
+            android:layout_width="70px"
+            android:layout_height="70px"
+            android:tintMode="multiply"
+            android:layout_gravity="center_vertical"/>
+
+        <ImageView
+            android:id="@+id/notif_icon_5"
+            android:layout_width="70px"
+            android:layout_height="70px"
+            android:tintMode="multiply"
+            android:layout_gravity="center_vertical"/>
+
+        <ImageView
+            android:id="@+id/notif_icon_6"
+            android:layout_width="70px"
+            android:layout_height="70px"
+            android:tintMode="multiply"
+            android:layout_gravity="center_vertical"/>
+
+    </LinearLayout>
+
+</LinearLayout>

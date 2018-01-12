@@ -4,12 +4,39 @@
     android:layout_height="160px">
 
     <include
+        android:id="@+id/notifs"
+        layout="@layout/notifications_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_toLeftOf="@id/wifi" />
+
+    <include
+        android:id="@+id/wifi"
+        layout="@layout/wifi_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_gravity="right"
+        android:layout_toLeftOf="@id/mobile" />
+
+    <include
+        android:id="@+id/mobile"
+        layout="@layout/mobile_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_gravity="right"
+        android:layout_toLeftOf="@id/battery" />
+
+    <include
         android:id="@+id/battery"
         layout="@layout/battery_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_toLeftOf="@+id/clock"
-        android:layout_gravity="right" />
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_gravity="right"
+        android:layout_toLeftOf="@+id/clock" />
 
     <include
         android:id="@+id/clock"

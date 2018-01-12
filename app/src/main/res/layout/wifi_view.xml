@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/wifi_view"
+        android:layout_width="90px"
+        android:layout_height="match_parent"
+        android:padding="2dp"
+        android:layout_gravity="center"
+        android:foregroundGravity="center"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_signal_wifi_null_black_24dp"
+        android:tint="#fff"/>
+
+</LinearLayout>

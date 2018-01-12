@@ -4,6 +4,18 @@
     <!--Widget Titles-->
     <string name="info_widget_title">Information Screen</string>
 
+    <!--Preference Category Titles-->
+    <string name="battery">Battery</string>
+    <string name="notifications">Notifications</string>
+    <string name="clock">Clock</string>
+    <string name="signal">Mobile Signal</string>
+    <string name="wifi">WiFi</string>
+
     <!--Preference Titles-->
-    <string name="battery_color_title">Battery Color</string>
+    <string name="color_title">Color</string>
+    <string name="show">Show</string>
+    <string name="show_percent">Show Percentage</string>
+    <string name="hour_24">24-Hour Time</string>
+    <string name="show_date">Show Date</string>
+    <string name="show_ampm">Show AM/PM</string>
 </resources>
