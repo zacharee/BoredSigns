@@ -44,6 +44,7 @@ class InfoWidget : AppWidgetProvider() {
             if (context.checkCallingOrSelfPermission(perm) != PackageManager.PERMISSION_GRANTED) {
                 val intent = Intent(context, PermissionsActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                intent.putExtra("class", this::class.java)
                 context.startActivity(intent)
                 return
             }

@@ -3,6 +3,7 @@
 
     <!--Widget Titles-->
     <string name="info_widget_title">Information Screen</string>
+    <string name="image_widget_title">Image Screen</string>
 
     <!--Preference Category Titles-->
     <string name="battery">Battery</string>
@@ -18,4 +19,9 @@
     <string name="hour_24">24-Hour Time</string>
     <string name="show_date">Show Date</string>
     <string name="show_ampm">Show AM/PM</string>
+    <string name="image">Image</string>
+    <string name="reset">Reset</string>
+
+    <!--Misc-->
+    <string name="select_image">Select Image</string>
 </resources>

@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:allowBackup="true"
@@ -22,9 +24,22 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.PermissionsActivity"
+        <activity android:name=".proxies.ImageProxy">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activities.PermissionsActivity"
             android:excludeFromRecents="true"
-            android:theme="@style/AppTheme.Null"/>
+            android:theme="@style/AppTheme.Null" />
+        <activity android:name=".activities.ImagePickerActivity"
+            android:exported="true"/>
+
+        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat"/>
 
         <receiver
             android:name=".widgets.InfoWidget"
@@ -40,6 +55,21 @@
             <meta-data
                 android:name="com.lge.signboard.widget.description"
                 android:value="info_widget_title" />
+        </receiver>
+        <receiver
+            android:name=".widgets.ImageWidget"
+            android:label="@string/image_widget_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.zacharee1.boredsigns.action.UPDATE_INFO" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/image_widget_info" />
+            <meta-data
+                android:name="com.lge.signboard.widget.description"
+                android:value="image_widget_title" />
         </receiver>
 
         <service
