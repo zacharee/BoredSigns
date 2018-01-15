@@ -1,0 +1,71 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="1040px"
+    android:layout_height="160px">
+
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="150px"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:paddingLeft="12px"
+        android:paddingRight="12px"
+        android:src="@drawable/ic_wb_sunny_black_24dp" />
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="700px"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/icon"
+        android:text="Sunny"
+        android:textSize="64px" />
+
+    <TextView
+        android:id="@+id/location"
+        android:layout_width="600px"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@id/title"
+        android:layout_toRightOf="@id/icon"
+        android:ellipsize="marquee"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:freezesText="true"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:scrollHorizontally="true"
+        android:singleLine="true"
+        android:text="Philadelphia, PA"
+        android:textSize="40px" />
+
+    <ProgressBar
+        android:id="@+id/loading"
+        android:layout_width="100px"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/yahoo"
+        android:layout_toLeftOf="@id/temp"
+        android:indeterminate="true" />
+
+    <TextView
+        android:id="@+id/temp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@id/title"
+        android:gravity="right"
+        android:text="100°F"
+        android:textSize="64px" />
+
+    <ImageView
+        android:id="@+id/yahoo"
+        android:layout_width="wrap_content"
+        android:layout_height="73px"
+        android:layout_alignBottom="@id/temp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toRightOf="@id/location"
+        android:scaleType="fitCenter"
+        android:src="@drawable/yahoo_attr"
+        android:textAlignment="viewEnd" />
+
+</RelativeLayout>

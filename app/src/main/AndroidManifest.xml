@@ -6,8 +6,13 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-feature android:name="android.hardware.location.network" android:required="false" />
+    <uses-feature android:name="android.hardware.location.gps" android:required="false"  />
 
     <application
         android:allowBackup="true"
@@ -31,15 +36,25 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".proxies.WeatherProxy">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".activities.PermissionsActivity"
             android:excludeFromRecents="true"
             android:theme="@style/AppTheme.Null" />
-        <activity android:name=".activities.ImagePickerActivity"
-            android:exported="true"/>
-
-        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
-            android:theme="@style/Base.Theme.AppCompat"/>
+        <activity
+            android:name=".activities.ImagePickerActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat" />
+        <activity android:name=".activities.LocationPickerActivity"
+            android:theme="@style/AppTheme.Null"/>
 
         <receiver
             android:name=".widgets.InfoWidget"
@@ -71,6 +86,20 @@
                 android:name="com.lge.signboard.widget.description"
                 android:value="image_widget_title" />
         </receiver>
+        <receiver
+            android:name=".widgets.WeatherWidget"
+            android:label="@string/weather_widget_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/weather_widget_info" />
+            <meta-data
+                android:name="com.lge.signboard.widget.description"
+                android:value="weather_widget_title" />
+        </receiver>
 
         <service
             android:name=".services.InfoService"
@@ -81,6 +110,13 @@
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
+        <service
+            android:name=".services.WeatherService"
+            android:exported="false" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCo0GdKgs-Bp0QKcHcM3nQyj7LPyEe82mE" />
     </application>
 
 </manifest>

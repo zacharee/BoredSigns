@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <SwitchPreference
+        android:title="Use Celsius"
+        android:key="weather_unit"
+        android:defaultValue="true" />
+
+    <SwitchPreference
+        android:title="Use Current Location"
+        android:key="use_location"
+        android:defaultValue="true" />
+
+    <Preference
+        android:title="Pick Location"
+        android:key="manual_location"
+        android:enabled="false"
+        android:widgetLayout="@layout/google_attr"/>
+
 </PreferenceScreen>

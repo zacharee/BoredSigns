@@ -13,7 +13,6 @@ import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.services.InfoService
 import com.zacharee1.boredsigns.util.Utils
 import com.zacharee1.boredsigns.widgets.ImageWidget
-import com.zacharee1.boredsigns.widgets.InfoWidget
 
 class ImagePickerActivity : AppCompatActivity() {
     companion object {
@@ -37,7 +36,7 @@ class ImagePickerActivity : AppCompatActivity() {
             if (resultCode == Activity.RESULT_OK) {
                 val uri = result.uri
                 PreferenceManager.getDefaultSharedPreferences(this).edit().putString("image_picker", uri.toString()).apply()
-                Utils.sendWidgetUpdate(this, ImageWidget::class.java)
+                Utils.sendWidgetUpdate(this, ImageWidget::class.java, null)
                 finish()
             }
         } else if (requestCode == SELECT_PICTURE) {

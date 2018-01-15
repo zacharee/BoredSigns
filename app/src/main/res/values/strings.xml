@@ -4,6 +4,7 @@
     <!--Widget Titles-->
     <string name="info_widget_title">Information Screen</string>
     <string name="image_widget_title">Image Screen</string>
+    <string name="weather_widget_title">Weather Screen</string>
 
     <!--Preference Category Titles-->
     <string name="battery">Battery</string>
@@ -24,4 +25,5 @@
 
     <!--Misc-->
     <string name="select_image">Select Image</string>
+    <string name="error_retrieving_weather">Error retrieving weather info: %s</string>
 </resources>

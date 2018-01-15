@@ -27,7 +27,7 @@ class ImageFragment : PreferenceFragment() {
         findPreference("image_reset").setOnPreferenceClickListener {
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("image_picker", null).apply()
             onResume()
-            Utils.sendWidgetUpdate(context, ImageWidget::class.java)
+            Utils.sendWidgetUpdate(context, ImageWidget::class.java, null)
             true
         }
     }

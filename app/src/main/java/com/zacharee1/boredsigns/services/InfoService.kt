@@ -104,6 +104,12 @@ class InfoService : NotificationListenerService() {
 
         startForeground(1337, Notification())
 
+        if (!shouldAct()) {
+            stopForeground(true)
+            stopSelf()
+            stopSelf(1337)
+        }
+
         val filter = IntentFilter()
         for (s in INTENTS) {
             filter.addAction(s)
