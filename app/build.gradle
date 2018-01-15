@@ -4,14 +4,16 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+project.ext.version = 2
+
 android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.zacharee1.boredsigns"
         minSdkVersion 23
         targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
+        versionCode project.ext.version
+        versionName project.ext.version + ""
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
