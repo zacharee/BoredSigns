@@ -8,3 +8,4 @@
 /build
 /captures
 .externalNativeBuild
+/app/src/main/java/com/zacharee1/boredsigns/App.kt

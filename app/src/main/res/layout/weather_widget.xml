@@ -17,6 +17,7 @@
         android:layout_width="700px"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
+        android:textColor="#fff"
         android:layout_toRightOf="@id/icon"
         android:text="Sunny"
         android:textSize="64px" />
@@ -26,6 +27,7 @@
         android:layout_width="600px"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:textColor="#fff"
         android:layout_below="@id/title"
         android:layout_toRightOf="@id/icon"
         android:ellipsize="marquee"
@@ -40,6 +42,7 @@
 
     <ProgressBar
         android:id="@+id/loading"
+        android:indeterminateTint="#fff"
         android:layout_width="100px"
         android:layout_height="wrap_content"
         android:layout_above="@id/yahoo"
@@ -50,6 +53,7 @@
         android:id="@+id/temp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="#fff"
         android:layout_alignParentRight="true"
         android:layout_toRightOf="@id/title"
         android:gravity="right"

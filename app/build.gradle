@@ -6,7 +6,7 @@ apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'io.fabric'
 
-project.ext.version = 3
+project.ext.version = 4
 
 android {
     compileSdkVersion 27
@@ -16,7 +16,6 @@ android {
         targetSdkVersion 27
         versionCode project.ext.version
         versionName project.ext.version + ""
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
         sourceCompatibility 1.8
@@ -35,11 +34,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:27.0.2'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation 'com.jaredrummler:colorpicker:1.0.1'
-    implementation 'com.theartofdev.edmodo:android-image-cropper:2.6.+'
+    implementation 'com.theartofdev.edmodo:android-image-cropper:2.6.0'
     implementation 'zh.wang.android:yweathergetter4a:1.3.0'
     implementation 'com.google.android.gms:play-services-location:11.8.0'
     implementation 'com.google.android.gms:play-services-maps:11.8.0'
@@ -49,6 +45,7 @@ dependencies {
         transitive = true
     }
     implementation 'com.google.firebase:firebase-core:11.8.0'
+    implementation 'com.github.javiersantos:PiracyChecker:1.2'
 }
 
 apply plugin: 'com.google.gms.google-services'
