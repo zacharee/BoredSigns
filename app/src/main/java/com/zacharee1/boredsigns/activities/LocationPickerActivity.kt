@@ -23,7 +23,7 @@ class LocationPickerActivity : AppCompatActivity() {
         startActivityForResult(PlacePicker.IntentBuilder().build(this), REQUEST_CODE)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (resultCode == Activity.RESULT_OK) {
