@@ -5,6 +5,8 @@ import android.content.Context
 import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.preference.PreferenceManager
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
@@ -47,6 +49,7 @@ class NavBarConfigureActivity : AppCompatActivity() {
             val view = LayoutInflater.from(this).inflate(R.layout.vh, buttonOrderer, false) as NavBarDragItemView
             view.findViewById<ImageView>(R.id.close_button).setOnClickListener {
                 buttonArray.remove(view)
+                buttonOrderer.removeDragView(view)
 
                 val new = getKeyOrder(buttonArray)
                 saveNewOrder(new)
@@ -55,8 +58,7 @@ class NavBarConfigureActivity : AppCompatActivity() {
             view.findViewById<TextView>(R.id.text).text = button.getName()
             view.key = button.getKey()
 
-            if (!buttonArray.contains(view)) buttonOrderer.addDragView(view, view)
-            if (!buttonArray.contains(view)) buttonArray.add(view)
+            if (!addIfNotContains(view)) buttonArray.add(view)
         }
 
         buttonOrderer.setOnViewSwapListener { firstView, firstPosition, secondView, secondPosition ->
@@ -66,6 +68,8 @@ class NavBarConfigureActivity : AppCompatActivity() {
             saveNewOrder(new)
             sendUpdate(new)
         }
+
+        buttonOrderer.setContainerScrollView(findViewById(R.id.buttons_order_wrapper))
 
         val listener = View.OnClickListener {
             var keyToAdd = ""
@@ -92,8 +96,7 @@ class NavBarConfigureActivity : AppCompatActivity() {
             view.findViewById<TextView>(R.id.text).text = button.getName()
             view.key = button.getKey()
 
-            if (!buttonArray.contains(view)) buttonOrderer.addDragView(view, view)
-            if (!buttonArray.contains(view)) buttonArray.add(view)
+            if (!addIfNotContains(view)) buttonArray.add(view)
 
             val new = getKeyOrder(buttonArray)
             saveNewOrder(new)
@@ -109,6 +112,20 @@ class NavBarConfigureActivity : AppCompatActivity() {
                 view.setOnClickListener(listener)
             }
         }
+    }
+
+    private fun addIfNotContains(view: NavBarDragItemView): Boolean {
+        val orderer = findViewById<DragLinearLayout>(R.id.buttons_order)
+        for (i in 0 until orderer.childCount) {
+            val v = orderer.getChildAt(i)
+
+            if (v is NavBarDragItemView) {
+                if (v.key == view.key) return true
+            }
+        }
+
+        orderer.addDragView(view, view.findViewById(R.id.drag_handle))
+        return false
     }
 
     private fun getKeyOrder(buttons: List<NavBarDragItemView>): List<String?> {

@@ -32,9 +32,10 @@
         android:id="@+id/buttons_order_wrapper"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toTopOf="@id/control_bar_wrapper"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/control_bar"
         app:layout_constraintTop_toBottomOf="@id/navbar_view_wrapper">
 
         <com.jmedeisis.draglinearlayout.DragLinearLayout
@@ -44,106 +45,114 @@
 
     </ScrollView>
 
-    <LinearLayout
-        android:id="@+id/control_bar"
+    <HorizontalScrollView
+        android:id="@+id/control_bar_wrapper"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_gravity="center_horizontal"
-        android:background="?android:colorPrimary"
-        android:elevation="4dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
+        android:layout_height="wrap_content"
         android:paddingEnd="4dp"
         android:paddingStart="4dp"
+        android:background="?android:colorPrimary"
+        android:elevation="4dp"
+        android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/buttons_order_wrapper">
 
-        <ImageView
-            android:id="@+id/back"
-            android:layout_width="48dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/navbar_ripple"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="10dp"
-            android:src="@drawable/ic_arrow_back_black_24dp"
-            android:tint="#fff" />
+        <LinearLayout
+            android:id="@+id/control_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-        <ImageView
-            android:id="@+id/home"
-            android:layout_width="48dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/navbar_ripple"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="10dp"
-            android:src="@drawable/ic_radio_button_checked_black_24dp"
-            android:tint="#fff" />
+            <ImageView
+                android:id="@+id/back"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/navbar_ripple"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="10dp"
+                android:src="@drawable/ic_arrow_back_black_24dp"
+                android:tint="#fff" />
 
-        <ImageView
-            android:id="@+id/recents"
-            android:layout_width="48dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/navbar_ripple"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="10dp"
-            android:src="@drawable/ic_crop_square_black_24dp"
-            android:tint="#fff" />
+            <ImageView
+                android:id="@+id/home"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/navbar_ripple"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="10dp"
+                android:src="@drawable/ic_radio_button_checked_black_24dp"
+                android:tint="#fff" />
 
-        <ImageView
-            android:id="@+id/split"
-            android:layout_width="48dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/navbar_ripple"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="10dp"
-            android:src="@drawable/split_screen"
-            android:tint="#fff" />
+            <ImageView
+                android:id="@+id/recents"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/navbar_ripple"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="10dp"
+                android:src="@drawable/ic_crop_square_black_24dp"
+                android:tint="#fff" />
 
-        <ImageView
-            android:id="@+id/power"
-            android:layout_width="48dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/navbar_ripple"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="10dp"
-            android:src="@drawable/ic_power_settings_new_black_24dp"
-            android:tint="#fff" />
+            <ImageView
+                android:id="@+id/split"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/navbar_ripple"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="10dp"
+                android:src="@drawable/split_screen"
+                android:tint="#fff" />
 
-        <ImageView
-            android:id="@+id/qs"
-            android:layout_width="48dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/navbar_ripple"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="10dp"
-            android:src="@drawable/toggle_off"
-            android:tint="#fff" />
+            <ImageView
+                android:id="@+id/power"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/navbar_ripple"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="10dp"
+                android:src="@drawable/ic_power_settings_new_black_24dp"
+                android:tint="#fff" />
 
-        <ImageView
-            android:id="@+id/notifs"
-            android:layout_width="48dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/navbar_ripple"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="10dp"
-            android:src="@drawable/ic_notifications_none_black_24dp"
-            android:tint="#fff" />
+            <ImageView
+                android:id="@+id/qs"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/navbar_ripple"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="10dp"
+                android:src="@drawable/toggle_off"
+                android:tint="#fff" />
 
-    </LinearLayout>
+            <ImageView
+                android:id="@+id/notifs"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/navbar_ripple"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="10dp"
+                android:src="@drawable/ic_notifications_none_black_24dp"
+                android:tint="#fff" />
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
 
 </android.support.constraint.ConstraintLayout>
