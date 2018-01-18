@@ -23,9 +23,19 @@
     <string name="show_ampm">Show AM/PM</string>
     <string name="image">Image</string>
     <string name="reset">Reset</string>
+    
+    <!--NavBar-->
+    <string name="home">Home</string>
+    <string name="recents">Recents</string>
+    <string name="back">Back</string>
+    <string name="splitscreen">Toggle Split-Screen</string>
+    <string name="qs">Expand Quick Settings</string>
+    <string name="notifs">Expand Notifications</string>
+    <string name="power">Open Power Menu</string>
 
     <!--Misc-->
     <string name="select_image">Select Image</string>
     <string name="error_retrieving_weather">Error retrieving weather info: %s</string>
     <string name="tap_to_configure">Tap to Configure</string>
+    <string name="add_button">Add Button</string>
 </resources>

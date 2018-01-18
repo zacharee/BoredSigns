@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.preference.PreferenceFragment
 import com.zacharee1.boredsigns.fragments.ImageFragment
 import com.zacharee1.boredsigns.fragments.InfoFragment
+import com.zacharee1.boredsigns.fragments.NavBarFragment
 import com.zacharee1.boredsigns.fragments.WeatherFragment
 
 class ConfigActivity : AppCompatActivity() {
@@ -15,6 +16,7 @@ class ConfigActivity : AppCompatActivity() {
         val INFO = "info"
         val WEATHER = "weather"
         val IMAGE = "image"
+        val NAV = "nav"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,6 +32,7 @@ class ConfigActivity : AppCompatActivity() {
                 INFO -> fragment = InfoFragment()
                 WEATHER -> fragment = WeatherFragment()
                 IMAGE -> fragment = ImageFragment()
+                NAV -> fragment = NavBarFragment()
             }
 
             fragmentManager.beginTransaction().replace(R.id.content_main, fragment).commit()

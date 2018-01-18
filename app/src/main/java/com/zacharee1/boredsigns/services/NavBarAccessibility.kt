@@ -14,22 +14,37 @@ class NavBarAccessibility : AccessibilityService() {
         val HOME = BASE + "HOME"
         val BACK = BASE + "BACK"
         val RECENTS = BASE + "RECENTS"
+        val NOTIFS = BASE + "NOTIFS"
+        val SPLIT = BASE + "SPLIT"
+        val QS = BASE + "QS"
+        val POWER = BASE + "POWER"
     }
 
     val receiver = object : BroadcastReceiver() {
-        override fun onReceive(p0: Context?, p1: Intent?) {
+        override fun onReceive(p0: Context, p1: Intent?) {
+            val statusBarManager = p0.getSystemService("statusbar")
+            val collapsePanels = Class.forName("android.app.StatusBarManager").getMethod("collapsePanels")
+
             when (p1?.action) {
-                RECENTS -> {
-                    performGlobalAction(GLOBAL_ACTION_RECENTS)
+                RECENTS -> performGlobalAction(GLOBAL_ACTION_RECENTS)
+
+                HOME -> performGlobalAction(GLOBAL_ACTION_HOME)
+
+                BACK -> performGlobalAction(GLOBAL_ACTION_BACK)
+
+                NOTIFS -> {
+                    collapsePanels.invoke(statusBarManager)
+                    performGlobalAction(GLOBAL_ACTION_NOTIFICATIONS)
                 }
 
-                HOME -> {
-                    performGlobalAction(GLOBAL_ACTION_HOME)
+                SPLIT -> performGlobalAction(GLOBAL_ACTION_TOGGLE_SPLIT_SCREEN)
+
+                QS -> {
+                    collapsePanels.invoke(statusBarManager)
+                    performGlobalAction(GLOBAL_ACTION_QUICK_SETTINGS)
                 }
 
-                BACK -> {
-                    performGlobalAction(GLOBAL_ACTION_BACK)
-                }
+                POWER -> performGlobalAction(GLOBAL_ACTION_POWER_DIALOG)
             }
         }
     }
@@ -43,6 +58,10 @@ class NavBarAccessibility : AccessibilityService() {
         filter.addAction(HOME)
         filter.addAction(RECENTS)
         filter.addAction(BACK)
+        filter.addAction(NOTIFS)
+        filter.addAction(SPLIT)
+        filter.addAction(QS)
+        filter.addAction(POWER)
 
         registerReceiver(receiver, filter)
     }
