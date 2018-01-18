@@ -7,8 +7,11 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.preference.PreferenceManager
+import android.provider.Settings
 import android.widget.RemoteViews
+import android.widget.Toast
 
 import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.activities.PermissionsActivity
@@ -27,6 +30,13 @@ class NavBarWidget : AppWidgetProvider() {
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 intent.putExtra("class", this::class.java)
                 context.startActivity(intent)
+                return
+            }
+
+            val enabledServices = Settings.Secure.getString(context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
+            if (enabledServices == null || !enabledServices.contains(context.packageName)) {
+                context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                Toast.makeText(context, context.resources.getText(R.string.enable_accessibility), Toast.LENGTH_LONG).show()
                 return
             }
         }
@@ -89,7 +99,10 @@ class NavBarWidget : AppWidgetProvider() {
                 }
             }
 
-            views.addView(R.id.nav_bar, RemoteViews(context.packageName, layout))
+            val new = RemoteViews(context.packageName, layout)
+            new.setInt(R.id.image, "setColorFilter", prefs.getInt("nav_button_color", Color.WHITE))
+
+            views.addView(R.id.nav_bar, new )
             val pendingIntent = PendingIntent.getBroadcast(context, 0, Intent(action), 0)
             views.setOnClickPendingIntent(id, pendingIntent)
         }

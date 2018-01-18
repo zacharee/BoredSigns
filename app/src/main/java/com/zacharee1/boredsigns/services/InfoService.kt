@@ -16,6 +16,7 @@ import android.telephony.PhoneStateListener
 import android.telephony.SignalStrength
 import android.telephony.TelephonyManager
 import android.util.Log
+import com.zacharee1.boredsigns.util.Utils
 
 
 class InfoService : NotificationListenerService() {
@@ -129,14 +130,7 @@ class InfoService : NotificationListenerService() {
         mConnected = true
 
         if (shouldAct()) {
-            RANKING = currentRanking
-            NOTIFS = activeNotifications
-
-            val extras = Bundle()
-            extras.putBoolean(RANKING_LIST, true)
-            extras.putBoolean(NOTIF_LIST, true)
-
-            sendUpdateBroadcast(extras)
+            sendUpdateBroadcast(null)
         }
     }
 
@@ -165,16 +159,11 @@ class InfoService : NotificationListenerService() {
             NOTIFS = activeNotifications
         }
 
-        val man = AppWidgetManager.getInstance(this)
-        val ids = man.getAppWidgetIds(
-                ComponentName(this, InfoWidget::class.java))
-        val updateIntent = Intent()
-        updateIntent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-        updateIntent.putExtra("appWidgetIds", ids)
-        if (mConnected) updateIntent.putExtra(RANKING_LIST, true)
-        if (mConnected) updateIntent.putExtra(NOTIF_LIST, true)
-        if (extras != null) updateIntent.putExtras(extras)
-        updateIntent.component = ComponentName(this, InfoWidget::class.java)
-        sendBroadcast(updateIntent)
+        val update = Bundle(extras ?: Bundle())
+
+        if (mConnected) update.putBoolean(RANKING_LIST, true)
+        if (mConnected) update.putBoolean(NOTIF_LIST, true)
+
+        Utils.sendWidgetUpdate(this, InfoWidget::class.java, update)
     }
 }

@@ -38,4 +38,6 @@
     <string name="error_retrieving_weather">Error retrieving weather info: %s</string>
     <string name="tap_to_configure">Tap to Configure</string>
     <string name="add_button">Add Button</string>
+    <string name="grant_notification_access">Please allow notification access for BoredSigns.</string>
+    <string name="enable_accessibility">Please enable the BoredSigns accessibility service.</string>
 </resources>

@@ -3,6 +3,7 @@ package com.zacharee1.boredsigns.widgets
 import android.Manifest
 import android.app.ActivityManager
 import android.app.Notification
+import android.app.NotificationManager
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.*
@@ -19,9 +20,11 @@ import android.os.BatteryManager
 import android.preference.PreferenceManager
 import android.provider.Settings
 import android.service.notification.NotificationListenerService
+import android.support.v4.app.NotificationManagerCompat
 import android.telephony.*
 import android.view.View
 import android.widget.RemoteViews
+import android.widget.Toast
 import com.zacharee1.boredsigns.services.InfoService
 
 import com.zacharee1.boredsigns.R
@@ -48,6 +51,13 @@ class InfoWidget : AppWidgetProvider() {
                 context.startActivity(intent)
                 return
             }
+        }
+
+        val enabledListeners = NotificationManagerCompat.getEnabledListenerPackages(context)
+        if (!enabledListeners.contains(context.packageName)) {
+            context.startActivity(Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"))
+            Toast.makeText(context, context.resources.getText(R.string.grant_notification_access), Toast.LENGTH_LONG).show()
+            return
         }
 
         mPrefs = PreferenceManager.getDefaultSharedPreferences(context)

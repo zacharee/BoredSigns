@@ -20,7 +20,8 @@ class NavBarFragment : PreferenceFragment() {
     }
 
     private fun setListeners() {
-        findPreference("nav_button_color").setOnPreferenceClickListener {
+        findPreference("nav_button_color").setOnPreferenceChangeListener {
+            preference, any ->
             Utils.sendWidgetUpdate(context, NavBarWidget::class.java, null)
             true
         }

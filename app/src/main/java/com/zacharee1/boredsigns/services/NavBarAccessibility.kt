@@ -1,12 +1,15 @@
 package com.zacharee1.boredsigns.services
 
 import android.accessibilityservice.AccessibilityService
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.support.v4.content.LocalBroadcastManager
 import android.view.accessibility.AccessibilityEvent
+import com.zacharee1.boredsigns.util.Utils
+import com.zacharee1.boredsigns.widgets.NavBarWidget
 
 class NavBarAccessibility : AccessibilityService() {
     companion object {
@@ -21,6 +24,7 @@ class NavBarAccessibility : AccessibilityService() {
     }
 
     val receiver = object : BroadcastReceiver() {
+        @SuppressLint("WrongConstant")
         override fun onReceive(p0: Context, p1: Intent?) {
             val statusBarManager = p0.getSystemService("statusbar")
             val collapsePanels = Class.forName("android.app.StatusBarManager").getMethod("collapsePanels")
@@ -64,6 +68,8 @@ class NavBarAccessibility : AccessibilityService() {
         filter.addAction(POWER)
 
         registerReceiver(receiver, filter)
+
+        Utils.sendWidgetUpdate(this, NavBarWidget::class.java, null)
     }
 
     override fun onAccessibilityEvent(p0: AccessibilityEvent?) {
