@@ -6,10 +6,12 @@ apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'io.fabric'
 
-project.ext.version = 4
+project.ext.version = 6
 
 android {
     compileSdkVersion 27
+    buildToolsVersion '27.0.3'
+
     defaultConfig {
         applicationId "com.zacharee1.boredsigns"
         minSdkVersion 23
@@ -46,7 +48,8 @@ dependencies {
     }
     implementation 'com.google.firebase:firebase-core:11.8.0'
     implementation 'com.github.javiersantos:PiracyChecker:1.2'
-    implementation 'com.jmedeisis:draglinearlayout:1.1.0'
+//    implementation 'com.jmedeisis:draglinearlayout:1.1.0'
+    implementation project(':draglinearlayout')
 }
 
 apply plugin: 'com.google.gms.google-services'

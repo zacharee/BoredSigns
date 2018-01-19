@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <uses-feature
         android:name="android.hardware.location.network"
@@ -27,22 +28,45 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ConfigActivity" />
-        <activity android:name=".proxies.InfoProxy">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".ConfigActivity"
+            android:exported="true"/>
+        <activity
+            android:name=".proxies.InfoProxy"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".proxies.ImageProxy">
+        <activity
+            android:name=".proxies.ImageProxy"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".proxies.WeatherProxy">
+        <activity
+            android:name=".proxies.WeatherProxy"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".proxies.NavProxy"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
 
@@ -52,16 +76,26 @@
         <activity
             android:name=".activities.PermissionsActivity"
             android:excludeFromRecents="true"
+            android:exported="true"
             android:theme="@style/AppTheme.Null" />
         <activity
             android:name=".activities.ImagePickerActivity"
             android:exported="true" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:exported="true"
             android:theme="@style/Base.Theme.AppCompat" />
         <activity
             android:name=".activities.LocationPickerActivity"
+            android:exported="true"
             android:theme="@style/AppTheme.Null" />
+        <activity
+            android:name=".activities.AODActivity"
+            android:exported="true"
+            android:label="@string/aod_editor"/>
+        <activity
+            android:name=".activities.NavBarConfigureActivity"
+            android:exported="true" />
 
         <receiver
             android:name=".widgets.InfoWidget"
@@ -69,6 +103,7 @@
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="com.zacharee1.boredsigns.action.UPDATE_INFO" />
+                <action android:name="android.intent.action.TIME_TICK" />
             </intent-filter>
 
             <meta-data
@@ -121,6 +156,14 @@
                 android:name="com.lge.signboard.widget.description"
                 android:value="tap_to_configure" />
         </receiver>
+        <receiver
+            android:name=".receivers.BootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
         <service
             android:name=".services.InfoService"
@@ -142,8 +185,6 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <activity android:name=".activities.NavBarConfigureActivity" />
-
         <service
             android:name=".services.NavBarAccessibility"
             android:enabled="true"
@@ -153,8 +194,6 @@
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
         </service>
-
-        <activity android:name=".proxies.NavProxy"></activity>
     </application>
 
 </manifest>

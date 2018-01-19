@@ -1,5 +1,7 @@
 <resources>
+    <!--Labels-->
     <string name="app_name">BoredSigns</string>
+    <string name="aod_editor">AOD Editor</string>
 
     <!--Widget Titles-->
     <string name="info_widget_title">Information Screen</string>
@@ -23,7 +25,9 @@
     <string name="show_ampm">Show AM/PM</string>
     <string name="image">Image</string>
     <string name="reset">Reset</string>
-    
+    <string name="edit_screen_on">Edit Screen-On Widgets</string>
+    <string name="edit_aod">Edit AOD Widgets</string>
+
     <!--NavBar-->
     <string name="home">Home</string>
     <string name="recents">Recents</string>
@@ -40,4 +44,6 @@
     <string name="add_button">Add Button</string>
     <string name="grant_notification_access">Please allow notification access for BoredSigns.</string>
     <string name="enable_accessibility">Please enable the BoredSigns accessibility service.</string>
+    <string name="no_config_activity">No configuration found</string>
+    <string name="error_launching_config">Error launching configuration</string>
 </resources>

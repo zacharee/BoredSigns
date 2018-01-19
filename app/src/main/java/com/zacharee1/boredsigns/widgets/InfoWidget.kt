@@ -17,6 +17,7 @@ import android.graphics.drawable.Drawable
 import android.net.wifi.SupplicantState
 import android.net.wifi.WifiManager
 import android.os.BatteryManager
+import android.os.PowerManager
 import android.preference.PreferenceManager
 import android.provider.Settings
 import android.service.notification.NotificationListenerService
@@ -29,6 +30,7 @@ import com.zacharee1.boredsigns.services.InfoService
 
 import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.activities.PermissionsActivity
+import com.zacharee1.boredsigns.util.Utils
 import java.util.*
 
 class InfoWidget : AppWidgetProvider() {
@@ -64,11 +66,13 @@ class InfoWidget : AppWidgetProvider() {
 
         val views = RemoteViews(context.packageName, R.layout.info_widget)
 
-        updateBattery(views, context)
-        updateClock(views)
-        updateMobile(views, context, appWidgetManager, appWidgetIds)
-        updateWifi(views, context)
-        updateNotifications(views)
+        try {
+            updateBattery(views, context)
+            updateClock(views)
+            updateMobile(views, context, appWidgetManager, appWidgetIds)
+            updateWifi(views, context)
+            updateNotifications(views)
+        } catch (e: Exception) {}
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetIds, views)
@@ -98,7 +102,7 @@ class InfoWidget : AppWidgetProvider() {
                                     if (notif.isOngoing) {
                                         state.show = false
                                     }
-                                    state.icon = notif.notification.smallIcon.loadDrawable(context)
+                                    state.icon = notif.notification.smallIcon?.loadDrawable(context)
                                 }
                             }
                         }
@@ -109,6 +113,14 @@ class InfoWidget : AppWidgetProvider() {
                     }
                 }
             }
+        }
+
+        if (intent?.action == Intent.ACTION_TIME_TICK) {
+            val pm = context?.getSystemService(Context.POWER_SERVICE) as PowerManager
+            if (!pm.isInteractive) {
+                Utils.sendWidgetUpdate(context, this@InfoWidget::class.java, null)
+            }
+            return
         }
 
         super.onReceive(context, intent)

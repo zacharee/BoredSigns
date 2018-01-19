@@ -87,7 +87,6 @@ class WeatherService : Service(), YahooWeatherInfoListener {
             Utils.sendWidgetUpdate(this, WeatherWidget::class.java, extras)
         } else {
             Toast.makeText(this, String.format(Locale.US, resources.getString(R.string.error_retrieving_weather), errorType.toString()), Toast.LENGTH_SHORT).show()
-
         }
     }
 

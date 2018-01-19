@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Preference
+        android:title="@string/edit_screen_on">
+        <intent
+            android:targetClass="com.lge.signboard.settings.SBSettingContents"
+            android:targetPackage="com.lge.signboard.settings"
+            android:action="android.intent.action.MAIN" />
+    </Preference>
+
+    <Preference
+        android:title="@string/edit_aod">
+        <intent
+            android:targetClass="com.zacharee1.boredsigns.activities.AODActivity"
+            android:targetPackage="com.zacharee1.boredsigns"
+            android:action="android.intent.action.MAIN" />
+    </Preference>
+
+</PreferenceScreen>
