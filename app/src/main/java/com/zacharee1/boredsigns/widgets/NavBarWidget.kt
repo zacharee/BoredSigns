@@ -19,23 +19,17 @@ import com.zacharee1.boredsigns.services.NavBarAccessibility
 
 class NavBarWidget : AppWidgetProvider() {
     companion object {
-        val BUTTONS_ORDER = "button_order"
-        val DEFAULT_ORDER = "recents|home|back"
+        const val BUTTONS_ORDER = "button_order"
+        const val DEFAULT_ORDER = "recents|home|back"
     }
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         for (perm in PermissionsActivity.REQUEST) {
-            if (context.checkCallingOrSelfPermission(perm) != PackageManager.PERMISSION_GRANTED) {
-                val intent = Intent(context, PermissionsActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                intent.putExtra("class", this::class.java)
-                context.startActivity(intent)
-                return
-            }
-
             val enabledServices = Settings.Secure.getString(context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
             if (enabledServices == null || !enabledServices.contains(context.packageName)) {
-                context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                context.startActivity(intent)
                 Toast.makeText(context, context.resources.getText(R.string.enable_accessibility), Toast.LENGTH_LONG).show()
                 return
             }

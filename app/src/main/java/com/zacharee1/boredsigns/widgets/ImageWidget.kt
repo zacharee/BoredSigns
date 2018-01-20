@@ -15,7 +15,7 @@ import com.zacharee1.boredsigns.activities.PermissionsActivity
 
 class ImageWidget : AppWidgetProvider() {
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        for (perm in PermissionsActivity.REQUEST) {
+        for (perm in PermissionsActivity.IMAGE_REQUEST) {
             if (context.checkCallingOrSelfPermission(perm) != PackageManager.PERMISSION_GRANTED) {
                 val intent = Intent(context, PermissionsActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK

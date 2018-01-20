@@ -3,13 +3,11 @@ package com.zacharee1.boredsigns.widgets
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
-import android.preference.PreferenceManager
 import android.support.v4.content.LocalBroadcastManager
 import android.view.View
 import android.widget.RemoteViews
@@ -17,7 +15,6 @@ import android.widget.RemoteViews
 import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.activities.PermissionsActivity
 import com.zacharee1.boredsigns.services.WeatherService
-import com.zacharee1.boredsigns.util.Utils
 
 class WeatherWidget : AppWidgetProvider() {
     private var temp: String? = null
@@ -26,7 +23,7 @@ class WeatherWidget : AppWidgetProvider() {
     private var icon: Bitmap? = null
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        for (perm in PermissionsActivity.REQUEST) {
+        for (perm in PermissionsActivity.WEATHER_REQUEST) {
             if (context.checkCallingOrSelfPermission(perm) != PackageManager.PERMISSION_GRANTED) {
                 val intent = Intent(context, PermissionsActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -40,6 +37,12 @@ class WeatherWidget : AppWidgetProvider() {
 
         val views = RemoteViews(context.packageName, R.layout.weather_widget)
 
+        val intent = Intent(context, WeatherService::class.java)
+        intent.action = WeatherService.ACTION_UPDATE_WEATHER
+        val pIntent = PendingIntent.getService(context, 10, intent, 0)
+        views.setOnClickPendingIntent(R.id.refresh, pIntent)
+
+        views.setViewVisibility(R.id.refresh, View.GONE)
         views.setViewVisibility(R.id.loading, View.VISIBLE)
         setYahooPendingIntent(views, context)
         setThings(views, context)
@@ -87,10 +90,10 @@ class WeatherWidget : AppWidgetProvider() {
 
     private fun setYahooPendingIntent(views: RemoteViews, context: Context) {
         val intent = Intent(Intent.ACTION_VIEW)
-        intent.data = Uri.parse("https://www.yahoo.com/?ilc=401")
+        intent.data = Uri.parse("https://openweathermap.org/")
         val pendingIntent = PendingIntent.getActivity(context, 1337, intent, 0)
 
-        views.setOnClickPendingIntent(R.id.yahoo, pendingIntent)
+        views.setOnClickPendingIntent(R.id.owm, pendingIntent)
     }
 
     private fun setThings(views: RemoteViews, context: Context) {
@@ -99,6 +102,7 @@ class WeatherWidget : AppWidgetProvider() {
         }
         else {
             views.setViewVisibility(R.id.loading, View.GONE)
+            views.setViewVisibility(R.id.refresh, View.VISIBLE)
             views.setImageViewBitmap(R.id.icon, icon)
             views.setTextViewText(R.id.title, desc)
             views.setTextViewText(R.id.location, loc)

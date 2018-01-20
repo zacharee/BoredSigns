@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="1040px"
     android:layout_height="160px">
@@ -9,17 +10,16 @@
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:paddingLeft="12px"
-        android:paddingRight="12px"
-        android:src="@drawable/ic_wb_sunny_black_24dp" />
+        android:paddingRight="12px" />
 
     <TextView
         android:id="@+id/title"
-        android:layout_width="700px"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:textColor="#fff"
         android:layout_toRightOf="@id/icon"
         android:text="Sunny"
+        android:textColor="#fff"
         android:textSize="64px" />
 
     <TextView
@@ -45,23 +45,35 @@
         android:indeterminateTint="#fff"
         android:layout_width="100px"
         android:layout_height="wrap_content"
-        android:layout_above="@id/yahoo"
+        android:layout_above="@id/owm"
         android:layout_toLeftOf="@id/temp"
         android:indeterminate="true" />
+
+    <ImageView
+        android:focusable="true"
+        android:clickable="true"
+        android:background="@drawable/navbar_ripple"
+        android:id="@+id/refresh"
+        android:layout_width="100px"
+        android:layout_height="match_parent"
+        android:layout_above="@id/owm"
+        android:layout_toLeftOf="@id/temp"
+        android:src="@drawable/ic_refresh_black_24dp"
+        android:tint="#fff"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/temp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#fff"
         android:layout_alignParentRight="true"
-        android:layout_toRightOf="@id/title"
         android:gravity="right"
-        android:text="100°F"
+        android:text="100.0°F"
+        android:textColor="#fff"
         android:textSize="64px" />
 
     <ImageView
-        android:id="@+id/yahoo"
+        android:id="@+id/owm"
         android:layout_width="wrap_content"
         android:layout_height="73px"
         android:layout_alignBottom="@id/temp"
@@ -69,7 +81,8 @@
         android:layout_alignParentEnd="true"
         android:layout_toRightOf="@id/location"
         android:scaleType="fitCenter"
-        android:src="@drawable/yahoo_attr"
+        android:tint="#fff"
+        android:src="@drawable/openweathermap_attr"
         android:textAlignment="viewEnd" />
 
 </RelativeLayout>

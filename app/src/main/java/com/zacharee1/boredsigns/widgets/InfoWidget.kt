@@ -45,7 +45,7 @@ class InfoWidget : AppWidgetProvider() {
     private var mOldRanking: NotificationListenerService.RankingMap? = null
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        for (perm in PermissionsActivity.REQUEST) {
+        for (perm in PermissionsActivity.INFO_REQUEST) {
             if (context.checkCallingOrSelfPermission(perm) != PackageManager.PERMISSION_GRANTED) {
                 val intent = Intent(context, PermissionsActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -57,7 +57,7 @@ class InfoWidget : AppWidgetProvider() {
 
         val enabledListeners = NotificationManagerCompat.getEnabledListenerPackages(context)
         if (!enabledListeners.contains(context.packageName)) {
-            context.startActivity(Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"))
+            context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
             Toast.makeText(context, context.resources.getText(R.string.grant_notification_access), Toast.LENGTH_LONG).show()
             return
         }

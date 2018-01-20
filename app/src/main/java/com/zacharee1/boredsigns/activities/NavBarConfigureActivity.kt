@@ -182,6 +182,8 @@ class NavBarConfigureActivity : AppCompatActivity() {
                 "notif" -> layoutId = R.layout.navbar_notifs
             }
 
+            if (layoutId == 0) return
+
             inflate(context, layoutId, this)
         }
 

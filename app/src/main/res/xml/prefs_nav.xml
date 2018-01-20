@@ -2,12 +2,12 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <com.jaredrummler.android.colorpicker.ColorPreference
-        android:title="Color"
+        android:title="@string/color_title"
         android:key="nav_button_color"
         android:defaultValue="-1" />
 
     <Preference
-        android:title="Edit Layout"
+        android:title="@string/edit_layout"
         android:key="edit_nav_layout">
         <intent
             android:action="android.intent.action.VIEW"
