@@ -8,6 +8,9 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.location.Geocoder
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.os.Bundle
 import android.os.IBinder
 import android.preference.PreferenceManager
@@ -33,14 +36,14 @@ import java.util.*
 
 class WeatherService : Service() {
     companion object {
-        val ACTION_UPDATE_WEATHER = "com.zacharee1.boredsigns.action.UPDATE_WEATHER"
+        const val ACTION_UPDATE_WEATHER = "com.zacharee1.boredsigns.action.UPDATE_WEATHER"
 
-        val EXTRA_TEMP = "temp"
-        val EXTRA_LOC = "loc"
-        val EXTRA_DESC = "desc"
-        val EXTRA_ICON = "icon"
+        const val EXTRA_TEMP = "temp"
+        const val EXTRA_LOC = "loc"
+        const val EXTRA_DESC = "desc"
+        const val EXTRA_ICON = "icon"
 
-        val WHICH_UNIT = "weather_unit"
+        const val WHICH_UNIT = "weather_unit"
     }
 
     private var useCelsius: Boolean = true
@@ -88,6 +91,28 @@ class WeatherService : Service() {
         prefs = PreferenceManager.getDefaultSharedPreferences(this)
         prefs.registerOnSharedPreferenceChangeListener(prefsListener)
         locClient = LocationServices.getFusedLocationProviderClient(this)
+
+        if (checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            val locMan = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            locMan.requestSingleUpdate(LocationManager.GPS_PROVIDER, object : android.location.LocationListener {
+                override fun onLocationChanged(p0: Location?) {
+                    onHandleIntent(ACTION_UPDATE_WEATHER)
+                }
+
+                override fun onProviderDisabled(p0: String?) {
+
+                }
+
+                override fun onProviderEnabled(p0: String?) {
+
+                }
+
+                override fun onStatusChanged(p0: String?, p1: Int, p2: Bundle?) {
+
+                }
+            }, null)
+        }
+
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter(ACTION_UPDATE_WEATHER))
         startLocationUpdates()
     }
@@ -112,49 +137,51 @@ class WeatherService : Service() {
                 } else {
                     if (checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                         locClient.lastLocation.addOnCompleteListener {
-                            var lat = it.result.latitude
-                            var lon = it.result.longitude
+                            it.result?.let {
+                                var lat = it.latitude
+                                var lon = it.longitude
 
-                            val geo = Geocoder(baseContext, Locale.getDefault())
-                            val addrs = geo.getFromLocation(lat, lon, 1)
+                                val geo = Geocoder(baseContext, Locale.getDefault())
+                                val addrs = geo.getFromLocation(lat, lon, 1)
 
-                            if (!prefs.getBoolean("use_location", true)) {
-                                lat = prefs.getFloat("weather_lat", 51.508530F).toDouble()
-                                lon = prefs.getFloat("weather_lon", -0.076132F).toDouble()
+                                if (!prefs.getBoolean("use_location", true)) {
+                                    lat = prefs.getFloat("weather_lat", 51.508530F).toDouble()
+                                    lon = prefs.getFloat("weather_lon", -0.076132F).toDouble()
+                                }
+
+                                val weather = WeatherMap(this, apiKey)
+
+                                weather.getLocationWeather(lat.toString(), lon.toString(), object : WeatherCallback() {
+                                    @SuppressLint("CheckResult")
+                                    override fun success(response: WeatherResponseModel?) {
+                                        val extras = Bundle()
+
+                                        val temp = response?.main?.temp
+                                        val tempDouble: Double = if (useCelsius) TempUnitConverter.convertToCelsius(temp) else TempUnitConverter.convertToFahrenheit(temp)
+
+                                        val formatted = DecimalFormat("#").format(tempDouble).toString()
+
+                                        extras.putString(EXTRA_TEMP, formatted + "°" + if (useCelsius) "C" else "F")
+                                        extras.putString(EXTRA_LOC, addrs[0].locality + ", " + addrs[0].adminArea)
+                                        extras.putString(EXTRA_DESC, WordUtils.capitalize(response?.weather?.get(0)?.description))
+
+                                        Utils.sendWidgetUpdate(this@WeatherService, WeatherWidget::class.java, extras)
+
+                                        Observable.fromCallable({asyncLoadUrl(URL(response?.weather?.get(0)?.iconLink))})
+                                                .subscribeOn(Schedulers.io())
+                                                .observeOn(AndroidSchedulers.mainThread())
+                                                .subscribe {
+                                                    bmp ->
+                                                    extras.putParcelable(EXTRA_ICON, bmp)
+                                                    Utils.sendWidgetUpdate(this@WeatherService, WeatherWidget::class.java, extras)
+                                                }
+                                    }
+
+                                    override fun failure(error: String?) {
+                                        Toast.makeText(this@WeatherService, String.format(Locale.US, resources.getString(R.string.error_retrieving_weather), error), Toast.LENGTH_SHORT).show()
+                                    }
+                                })
                             }
-
-                            val weather = WeatherMap(this, apiKey)
-
-                            weather.getLocationWeather(lat.toString(), lon.toString(), object : WeatherCallback() {
-                                @SuppressLint("CheckResult")
-                                override fun success(response: WeatherResponseModel?) {
-                                    val extras = Bundle()
-
-                                    val temp = response?.main?.temp
-                                    val tempDouble: Double = if (useCelsius) TempUnitConverter.convertToCelsius(temp) else TempUnitConverter.convertToFahrenheit(temp)
-
-                                    val formatted = DecimalFormat("#").format(tempDouble).toString()
-
-                                    extras.putString(EXTRA_TEMP, formatted + "°" + if (useCelsius) "C" else "F")
-                                    extras.putString(EXTRA_LOC, addrs[0].locality + ", " + addrs[0].adminArea)
-                                    extras.putString(EXTRA_DESC, WordUtils.capitalize(response?.weather?.get(0)?.description))
-
-                                    Utils.sendWidgetUpdate(this@WeatherService, WeatherWidget::class.java, extras)
-
-                                    Observable.fromCallable({asyncLoadUrl(URL(response?.weather?.get(0)?.iconLink))})
-                                            .subscribeOn(Schedulers.io())
-                                            .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe {
-                                                bmp ->
-                                                extras.putParcelable(EXTRA_ICON, bmp)
-                                                Utils.sendWidgetUpdate(this@WeatherService, WeatherWidget::class.java, extras)
-                                            }
-                                }
-
-                                override fun failure(error: String?) {
-                                    Toast.makeText(this@WeatherService, String.format(Locale.US, resources.getString(R.string.error_retrieving_weather), error), Toast.LENGTH_SHORT).show()
-                                }
-                            })
                         }
                     }
                 }
