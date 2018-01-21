@@ -13,17 +13,17 @@ import com.zacharee1.boredsigns.widgets.NavBarWidget
 
 class NavBarAccessibility : AccessibilityService() {
     companion object {
-        val BASE = "com.zacharee1.boredsigns.action."
-        val HOME = BASE + "HOME"
-        val BACK = BASE + "BACK"
-        val RECENTS = BASE + "RECENTS"
-        val NOTIFS = BASE + "NOTIFS"
-        val SPLIT = BASE + "SPLIT"
-        val QS = BASE + "QS"
-        val POWER = BASE + "POWER"
+        const val BASE = "com.zacharee1.boredsigns.action."
+        const val HOME = BASE + "HOME"
+        const val BACK = BASE + "BACK"
+        const val RECENTS = BASE + "RECENTS"
+        const val NOTIFS = BASE + "NOTIFS"
+        const val SPLIT = BASE + "SPLIT"
+        const val QS = BASE + "QS"
+        const val POWER = BASE + "POWER"
     }
 
-    val receiver = object : BroadcastReceiver() {
+    private val receiver = object : BroadcastReceiver() {
         @SuppressLint("WrongConstant")
         override fun onReceive(p0: Context, p1: Intent?) {
             val statusBarManager = p0.getSystemService("statusbar")

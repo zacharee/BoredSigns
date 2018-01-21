@@ -11,12 +11,12 @@ import com.zacharee1.boredsigns.fragments.WeatherFragment
 
 class ConfigActivity : AppCompatActivity() {
     companion object {
-        val SB_TYPE = "type"
+        const val SB_TYPE = "type"
 
-        val INFO = "info"
-        val WEATHER = "weather"
-        val IMAGE = "image"
-        val NAV = "nav"
+        const val INFO = "info"
+        const val WEATHER = "weather"
+        const val IMAGE = "image"
+        const val NAV = "nav"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

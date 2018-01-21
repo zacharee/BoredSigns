@@ -24,11 +24,12 @@ class InfoService : NotificationListenerService() {
         var NOTIFS: Array<StatusBarNotification?>? = null
         var RANKING: RankingMap? = null
 
-        val NOTIF_BASE = "com.zacharee1.boredsigns.action."
-        val NOTIF_UPDATE = NOTIF_BASE + "NOTIF_UPDATE"
+        const val BASE = "com.zacharee1.boredsigns.action."
+        const val NOTIF_UPDATE = BASE + "NOTIF_UPDATE"
+        const val REFRESH = BASE + "REFRESH"
 
-        val NOTIF_LIST = "notifs"
-        val RANKING_LIST = "ranks"
+        const val NOTIF_LIST = "notifs"
+        const val RANKING_LIST = "ranks"
 
         var KEYS = mutableListOf(
                 "show_percent",
@@ -56,7 +57,8 @@ class InfoService : NotificationListenerService() {
                 WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION,
                 WifiManager.SUPPLICANT_STATE_CHANGED_ACTION,
                 ConnectivityManager.CONNECTIVITY_ACTION,
-                NOTIF_UPDATE
+                NOTIF_UPDATE,
+                REFRESH
         )
     }
 

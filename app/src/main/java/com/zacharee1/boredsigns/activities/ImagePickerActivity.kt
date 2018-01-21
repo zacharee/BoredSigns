@@ -16,7 +16,7 @@ import com.zacharee1.boredsigns.widgets.ImageWidget
 
 class ImagePickerActivity : AppCompatActivity() {
     companion object {
-        val SELECT_PICTURE = 1
+        const val SELECT_PICTURE = 1
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

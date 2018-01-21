@@ -3,6 +3,7 @@ package com.zacharee1.boredsigns.activities
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
+import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.VibrationEffect
@@ -104,6 +105,10 @@ class NavBarConfigureActivity : AppCompatActivity() {
         }
 
         val control = findViewById<LinearLayout>(R.id.control_bar)
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            control.findViewById<ImageView>(R.id.split).visibility = View.GONE
+        }
 
         for (i in 0 until control.childCount) {
             val view = control.getChildAt(i)

@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.ActivityManager
 import android.app.Notification
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.*
@@ -65,6 +66,8 @@ class InfoWidget : AppWidgetProvider() {
         mPrefs = PreferenceManager.getDefaultSharedPreferences(context)
 
         val views = RemoteViews(context.packageName, R.layout.info_widget)
+
+        views.setOnClickPendingIntent(R.id.clock, PendingIntent.getBroadcast(context, 0, Intent(InfoService.REFRESH), 0))
 
         try {
             updateBattery(views, context)
