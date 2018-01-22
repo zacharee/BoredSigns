@@ -8,6 +8,12 @@
     <string name="image_widget_title">Image Screen</string>
     <string name="weather_widget_title">Weather Screen</string>
     <string name="navbar_widget_title">Navigation Bar Screen</string>
+    <string name="dev_widget_1_title">Developer Info Screen 1</string>
+    <string name="dev_widget_2_title">Developer Info Screen 2</string>
+
+    <!--Widget Summaries-->
+    <string name="dev_widget_1_desc">FPS, Used RAM, Charge Rate</string>
+    <string name="dev_widget_2_desc">CPU Temp, GPU Temp, Battery Temp</string>
 
     <!--Preference Category Titles-->
     <string name="battery">Battery</string>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="1040px"
+    android:layout_height="160px"
+    android:padding="12px">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/cpu"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:singleLine="true"
+            android:textAlignment="center"
+            android:textColor="#fff"
+            android:textSize="50px" />
+
+        <TextView
+            android:id="@+id/cpu_title"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:singleLine="true"
+            android:text="CPU (°C)"
+            android:textAlignment="center"
+            android:textColor="#fff"
+            android:textSize="50px" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/gpu"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:singleLine="true"
+            android:textAlignment="center"
+            android:textColor="#fff"
+            android:textSize="50px" />
+
+        <TextView
+            android:id="@+id/gpu_title"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:singleLine="true"
+            android:text="GPU (°C)"
+            android:textAlignment="center"
+            android:textColor="#fff"
+            android:textSize="50px" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/batt"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:singleLine="true"
+            android:textAlignment="center"
+            android:textColor="#fff"
+            android:textSize="50px" />
+
+        <TextView
+            android:id="@+id/batt_title"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:singleLine="true"
+            android:text="Battery (°C)"
+            android:textAlignment="center"
+            android:textColor="#fff"
+            android:textSize="50px" />
+
+    </LinearLayout>
+
+</LinearLayout>

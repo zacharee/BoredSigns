@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="1040px"
+    android:layout_height="160px"
+    android:padding="12px">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/fps"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:textAlignment="center"
+            android:textColor="#fff"
+            android:textSize="50px" />
+
+        <TextView
+            android:id="@+id/fps_title"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="FPS"
+            android:textAlignment="center"
+            android:textColor="#fff"
+            android:textSize="50px" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/mem_info"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:textAlignment="center"
+            android:textColor="#fff"
+            android:textSize="50px" />
+
+        <TextView
+            android:id="@+id/mem_info_title"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="Used RAM (MB)"
+            android:textAlignment="center"
+            android:textColor="#fff"
+            android:textSize="50px" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/bat_info"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:textAlignment="center"
+            android:textColor="#fff"
+            android:textSize="50px" />
+
+        <TextView
+            android:id="@+id/bat_info_title"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="Charge Rate (mA)"
+            android:textAlignment="center"
+            android:textColor="#fff"
+            android:textSize="50px" />
+
+    </LinearLayout>
+
+</LinearLayout>

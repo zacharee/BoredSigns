@@ -35,8 +35,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ConfigActivity"
-            android:exported="true"/>
+        <activity
+            android:name=".ConfigActivity"
+            android:exported="true" />
         <activity
             android:name=".proxies.InfoProxy"
             android:exported="true">
@@ -92,7 +93,7 @@
         <activity
             android:name=".activities.AODActivity"
             android:exported="true"
-            android:label="@string/aod_editor"/>
+            android:label="@string/aod_editor" />
         <activity
             android:name=".activities.NavBarConfigureActivity"
             android:exported="true" />
@@ -157,6 +158,34 @@
                 android:value="tap_to_configure" />
         </receiver>
         <receiver
+            android:name=".widgets.Dev1Widget"
+            android:label="@string/dev_widget_1_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/dev1_widget_info" />
+             <meta-data
+             android:name="com.lge.signboard.widget.description"
+             android:value="dev_widget_1_desc" />
+        </receiver>
+        <receiver
+            android:name=".widgets.Dev2Widget"
+            android:label="@string/dev_widget_2_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/dev2_widget_info" />
+            <meta-data
+                android:name="com.lge.signboard.widget.description"
+                android:value="dev_widget_2_desc" />
+        </receiver>
+        <receiver
             android:name=".receivers.BootReceiver"
             android:enabled="true"
             android:exported="true">
@@ -177,14 +206,6 @@
         <service
             android:name=".services.WeatherService"
             android:exported="false" />
-
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCo0GdKgs-Bp0QKcHcM3nQyj7LPyEe82mE" />
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
-
         <service
             android:name=".services.NavBarAccessibility"
             android:enabled="true"
@@ -194,6 +215,21 @@
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
         </service>
+        <service
+            android:name=".services.Dev1Service"
+            android:enabled="true"
+            android:exported="true"/>
+        <service
+            android:name=".services.Dev2Service"
+            android:enabled="true"
+            android:exported="true"/>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCo0GdKgs-Bp0QKcHcM3nQyj7LPyEe82mE" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
     </application>
 
 </manifest>

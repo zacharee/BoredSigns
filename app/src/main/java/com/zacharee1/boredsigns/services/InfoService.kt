@@ -156,15 +156,15 @@ class InfoService : NotificationListenerService() {
     }
 
     private fun sendUpdateBroadcast(extras: Bundle?) {
+        val update = Bundle(extras ?: Bundle())
+
         if (mConnected) {
             RANKING = currentRanking
             NOTIFS = activeNotifications
+
+            update.putBoolean(RANKING_LIST, true)
+            update.putBoolean(NOTIF_LIST, true)
         }
-
-        val update = Bundle(extras ?: Bundle())
-
-        if (mConnected) update.putBoolean(RANKING_LIST, true)
-        if (mConnected) update.putBoolean(NOTIF_LIST, true)
 
         Utils.sendWidgetUpdate(this, InfoWidget::class.java, update)
     }
