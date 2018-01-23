@@ -49,6 +49,9 @@
     <string name="notifs">Expand Notifications</string>
     <string name="power">Open Power Menu</string>
 
+    <!--Explanations-->
+    <string name="accessibility_service">BoredSigns\' Accessibility Service is used for the Navigation Bar widget. It allows the back, home, recents, splitscreen, notification, power and qs buttons to function. This service is not used for anything else.</string>
+
     <!--Misc-->
     <string name="select_image">Select Image</string>
     <string name="error_retrieving_weather">Error retrieving weather info: %s</string>

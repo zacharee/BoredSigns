@@ -19,9 +19,21 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class AODActivity : AppCompatActivity() {
-    private lateinit var appWidgetManager: AppWidgetManager
-    private lateinit var appWidgetHost: AppWidgetHost
-    private val aodWidgetTable: Hashtable<ComponentName, AppWidgetProviderInfo> = Hashtable()
+    companion object {
+        private lateinit var appWidgetManager: AppWidgetManager
+        private lateinit var appWidgetHost: AppWidgetHost
+
+        private val aodWidgetTable: Hashtable<ComponentName, AppWidgetProviderInfo> = Hashtable()
+
+        private fun getProviderInfo(info: WidgetInfo): AppWidgetProviderInfo? {
+            val providerInfo = appWidgetManager.getAppWidgetInfo(info.widgetId)
+            if (providerInfo != null && (providerInfo.provider == null || providerInfo.provider == ComponentName(info.packageName, info.className))) {
+                return providerInfo
+            }
+
+            return aodWidgetTable[ComponentName(info.packageName, info.className)]
+        }
+    }
 
     private lateinit var signBoardContext: Context
 
@@ -59,10 +71,10 @@ class AODActivity : AppCompatActivity() {
             if (widget.position == Integer.MAX_VALUE) widget.position = availWidgets.indexOf(widget)
 
             val view = LayoutInflater.from(this).inflate(R.layout.aod_item, dragView, false)
-            view.findViewById<TextView>(R.id.name).text = getProviderInfo(widget)?.loadLabel(packageManager)
+            view.findViewById<TextView>(R.id.name).text = widget.label
             view.findViewById<Switch>(R.id.toggle).let {
                 it.isChecked = currentWidgets.contains(widget)
-                it.setOnCheckedChangeListener { compoundButton, b ->
+                it.setOnCheckedChangeListener { _, b ->
                     if (b) {
                         if (!currentWidgets.contains(widget)) {
                             currentWidgets.add(widget)
@@ -96,7 +108,7 @@ class AODActivity : AppCompatActivity() {
             else dragView.addView(view)
         }
 
-        dragView.setOnViewSwapListener { firstView, firstPosition, secondView, secondPosition ->
+        dragView.setOnViewSwapListener { _, firstPosition, _, secondPosition ->
             if (currentWidgets.size > firstPosition
                     && currentWidgets.size > secondPosition
                     && (currentWidgets[firstPosition].position != Int.MAX_VALUE
@@ -131,6 +143,7 @@ class AODActivity : AppCompatActivity() {
                     info.packageName = it.getString(packageIndex)
                     info.className = it.getString(classIndex)
                     info.enable = it.getInt(enableIndex) != 0
+                    info.label = getProviderInfo(info)?.loadLabel(packageManager) ?: "Null"
 
                     ret.add(info)
                 }
@@ -147,6 +160,7 @@ class AODActivity : AppCompatActivity() {
             val info = WidgetInfo()
             info.packageName = provider.provider.packageName
             info.className = provider.provider.className
+            info.label = provider.loadLabel(packageManager)
             ret.add(info)
         }
 
@@ -156,7 +170,7 @@ class AODActivity : AppCompatActivity() {
     private fun sortAvailWidgets(avail: ArrayList<WidgetInfo>, current: ArrayList<WidgetInfo>) {
         for (widget in avail) {
             if (current.contains(widget)) {
-                val c = current.get(current.indexOf(widget))
+                val c = current[current.indexOf(widget)]
                 widget.position = c.position
                 widget.id = c.id
                 widget.widgetId = c.widgetId
@@ -202,22 +216,14 @@ class AODActivity : AppCompatActivity() {
         return maxOrder + 1
     }
 
-    private fun getProviderInfo(info: WidgetInfo): AppWidgetProviderInfo? {
-        val providerInfo = appWidgetManager.getAppWidgetInfo(info.widgetId)
-        if (providerInfo != null && (providerInfo.provider == null || providerInfo.provider == ComponentName(info.packageName, info.className))) {
-            return providerInfo
-        }
-
-        return aodWidgetTable[ComponentName(info.packageName, info.className)]
-    }
-
     class WidgetInfo : Comparable<WidgetInfo> {
         var id = -1
         var widgetId = 0
-        var position = Integer.MAX_VALUE
+        var position = Int.MAX_VALUE
         var packageName = ""
         var className = ""
         var enable = false
+        var label = ""
 
         fun toContentValues(): ContentValues {
             val ret = ContentValues()
@@ -236,7 +242,7 @@ class AODActivity : AppCompatActivity() {
         }
 
         override fun toString(): String {
-            return "WidgetInfo { id: $id, widgetId: $widgetId, position: $position, packageName: $packageName, className: $className, enable: $enable }"
+            return "WidgetInfo { id: $id, widgetId: $widgetId, position: $position, packageName: $packageName, className: $className, enable: $enable, label: $label }"
         }
 
         override fun equals(other: Any?): Boolean {

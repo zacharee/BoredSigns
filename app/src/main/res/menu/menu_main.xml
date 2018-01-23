@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/play"
+        android:title="Play Store"/>
+
+    <item
+        android:id="@+id/github"
+        android:title="GitHub" />
+
+    <item
+        android:id="@+id/google_plus"
+        android:title="Google+" />
+
+</menu>
