@@ -5,8 +5,15 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.preference.PreferenceManager
+import com.zacharee1.boredsigns.App
+import com.zacharee1.boredsigns.receivers.BootReceiver
 import com.zacharee1.boredsigns.services.InfoService
 import com.zacharee1.boredsigns.widgets.InfoWidget
+import java.io.BufferedInputStream
+import java.io.BufferedReader
+import java.io.DataInputStream
+import java.io.InputStreamReader
 
 class Utils {
     companion object {
@@ -20,6 +27,41 @@ class Utils {
             if (extras != null) updateIntent.putExtras(extras)
             updateIntent.component = ComponentName(context, clazz)
             context.sendBroadcast(updateIntent)
+        }
+
+        fun isBooted(context: Context): Boolean {
+            return PreferenceManager.getDefaultSharedPreferences(context.applicationContext).getBoolean("booted", false) && hasInternet()
+        }
+
+        fun isAuthed(context: Context): Boolean {
+            return PreferenceManager.getDefaultSharedPreferences(context.applicationContext).getBoolean("authed", false)
+        }
+
+        fun hasInternet(): Boolean {
+            try {
+                val process = Runtime.getRuntime().exec("ping -c 1 8.8.8.8")
+                process.waitFor()
+
+                val reader = BufferedReader(InputStreamReader(process.inputStream))
+
+                val result = StringBuilder()
+
+                while (true) {
+                    result.append(reader.readLine() ?: break)
+                }
+
+                return !(result.contains("unreachable"))
+            } catch (e: Exception) {
+                return false
+            }
+        }
+
+        fun setBooted(context: Context, booted: Boolean) {
+            PreferenceManager.getDefaultSharedPreferences(context.applicationContext).edit().putBoolean("booted", booted).apply()
+        }
+
+        fun setAuthed(context: Context, authed: Boolean) {
+            PreferenceManager.getDefaultSharedPreferences(context.applicationContext).edit().putBoolean("authed", authed).apply()
         }
     }
 }

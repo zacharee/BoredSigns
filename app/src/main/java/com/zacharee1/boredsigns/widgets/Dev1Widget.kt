@@ -9,24 +9,27 @@ import android.widget.RemoteViews
 
 import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.services.Dev1Service
+import com.zacharee1.boredsigns.util.Utils
 
 class Dev1Widget : AppWidgetProvider() {
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        context.startService(Intent(context, Dev1Service::class.java))
+        if (Utils.isBooted(context) && Utils.isAuthed(context)) {
+            context.startService(Intent(context, Dev1Service::class.java))
 
-        val views = RemoteViews(context.packageName, R.layout.dev1_widget)
-        views.setTextViewText(R.id.fps, Dev1Service.FPS.toString())
+            val views = RemoteViews(context.packageName, R.layout.dev1_widget)
+            views.setTextViewText(R.id.fps, Dev1Service.FPS.toString())
 
-        val actMan = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        val memInfo = ActivityManager.MemoryInfo()
+            val actMan = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            val memInfo = ActivityManager.MemoryInfo()
 
-        actMan.getMemoryInfo(memInfo)
+            actMan.getMemoryInfo(memInfo)
 
-        views.setTextViewText(R.id.mem_info, Dev1Service.USED_MEM.toString() + " / " + memInfo.totalMem / 0x100000L)
+            views.setTextViewText(R.id.mem_info, Dev1Service.USED_MEM.toString() + " / " + memInfo.totalMem / 0x100000L)
 
-        views.setTextViewText(R.id.bat_info, Dev1Service.CHARGE_RATE.toString())
+            views.setTextViewText(R.id.bat_info, Dev1Service.CHARGE_RATE.toString())
 
-        appWidgetManager.updateAppWidget(appWidgetIds, views)
+            appWidgetManager.updateAppWidget(appWidgetIds, views)
+        }
     }
 
     override fun onDisabled(context: Context?) {

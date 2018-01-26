@@ -8,28 +8,21 @@ import android.widget.RemoteViews
 
 import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.services.Dev2Service
+import com.zacharee1.boredsigns.util.Utils
 
 class Dev2Widget : AppWidgetProvider() {
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-//        for (perm in PermissionsActivity.IMAGE_REQUEST) {
-//            if (context.checkCallingOrSelfPermission(perm) != PackageManager.PERMISSION_GRANTED) {
-//                val intent = Intent(context, PermissionsActivity::class.java)
-//                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-//                intent.putExtra("class", this::class.java)
-//                context.startActivity(intent)
-//                return
-//            }
-//        }
+        if (Utils.isBooted(context) && Utils.isAuthed(context)) {
+            context.startService(Intent(context, Dev2Service::class.java))
 
-        context.startService(Intent(context, Dev2Service::class.java))
+            val views = RemoteViews(context.packageName, R.layout.dev2_widget)
 
-        val views = RemoteViews(context.packageName, R.layout.dev2_widget)
+            views.setTextViewText(R.id.cpu, Dev2Service.CPU.toString())
+            views.setTextViewText(R.id.gpu, Dev2Service.GPU.toString())
+            views.setTextViewText(R.id.batt, Dev2Service.BATT.toString())
 
-        views.setTextViewText(R.id.cpu, Dev2Service.CPU.toString())
-        views.setTextViewText(R.id.gpu, Dev2Service.GPU.toString())
-        views.setTextViewText(R.id.batt, Dev2Service.BATT.toString())
-
-        appWidgetManager.updateAppWidget(appWidgetIds, views)
+            appWidgetManager.updateAppWidget(appWidgetIds, views)
+        }
     }
 
     override fun onDisabled(context: Context?) {

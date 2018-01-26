@@ -15,6 +15,7 @@ import android.widget.RemoteViews
 import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.activities.PermissionsActivity
 import com.zacharee1.boredsigns.services.WeatherService
+import com.zacharee1.boredsigns.util.Utils
 
 class WeatherWidget : AppWidgetProvider() {
     private var temp: String? = null
@@ -23,31 +24,33 @@ class WeatherWidget : AppWidgetProvider() {
     private var icon: Bitmap? = null
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        for (perm in PermissionsActivity.WEATHER_REQUEST) {
-            if (context.checkCallingOrSelfPermission(perm) != PackageManager.PERMISSION_GRANTED) {
-                val intent = Intent(context, PermissionsActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                intent.putExtra("class", this::class.java)
-                context.startActivity(intent)
-                return
+        if (Utils.isAuthed(context) && Utils.isBooted(context)) {
+            for (perm in PermissionsActivity.WEATHER_REQUEST) {
+                if (context.checkCallingOrSelfPermission(perm) != PackageManager.PERMISSION_GRANTED) {
+                    val intent = Intent(context, PermissionsActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    intent.putExtra("class", this::class.java)
+                    context.startActivity(intent)
+                    return
+                }
             }
+
+            startService(context)
+
+            val views = RemoteViews(context.packageName, R.layout.weather_widget)
+
+            val intent = Intent(context, WeatherService::class.java)
+            intent.action = WeatherService.ACTION_UPDATE_WEATHER
+            val pIntent = PendingIntent.getService(context, 10, intent, 0)
+            views.setOnClickPendingIntent(R.id.refresh, pIntent)
+
+            views.setViewVisibility(R.id.refresh, View.GONE)
+            views.setViewVisibility(R.id.loading, View.VISIBLE)
+            setYahooPendingIntent(views, context)
+            setThings(views, context)
+
+            appWidgetManager.updateAppWidget(appWidgetIds, views)
         }
-
-        startService(context)
-
-        val views = RemoteViews(context.packageName, R.layout.weather_widget)
-
-        val intent = Intent(context, WeatherService::class.java)
-        intent.action = WeatherService.ACTION_UPDATE_WEATHER
-        val pIntent = PendingIntent.getService(context, 10, intent, 0)
-        views.setOnClickPendingIntent(R.id.refresh, pIntent)
-
-        views.setViewVisibility(R.id.refresh, View.GONE)
-        views.setViewVisibility(R.id.loading, View.VISIBLE)
-        setYahooPendingIntent(views, context)
-        setThings(views, context)
-
-        appWidgetManager.updateAppWidget(appWidgetIds, views)
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
