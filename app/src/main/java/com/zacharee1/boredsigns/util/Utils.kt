@@ -6,6 +6,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceManager
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.common.api.GoogleApi
 import com.zacharee1.boredsigns.App
 import com.zacharee1.boredsigns.receivers.BootReceiver
 import com.zacharee1.boredsigns.services.InfoService
@@ -29,14 +32,6 @@ class Utils {
             context.sendBroadcast(updateIntent)
         }
 
-        fun isBooted(context: Context): Boolean {
-            return PreferenceManager.getDefaultSharedPreferences(context.applicationContext).getBoolean("booted", false) && hasInternet()
-        }
-
-        fun isAuthed(context: Context): Boolean {
-            return PreferenceManager.getDefaultSharedPreferences(context.applicationContext).getBoolean("authed", false)
-        }
-
         fun hasInternet(): Boolean {
             try {
                 val process = Runtime.getRuntime().exec("ping -c 1 8.8.8.8")
@@ -56,12 +51,10 @@ class Utils {
             }
         }
 
-        fun setBooted(context: Context, booted: Boolean) {
-            PreferenceManager.getDefaultSharedPreferences(context.applicationContext).edit().putBoolean("booted", booted).apply()
-        }
-
-        fun setAuthed(context: Context, authed: Boolean) {
-            PreferenceManager.getDefaultSharedPreferences(context.applicationContext).edit().putBoolean("authed", authed).apply()
+        fun playServicesWorking(context: Context): Boolean {
+            val avail = GoogleApiAvailability.getInstance()
+            val result = avail.isGooglePlayServicesAvailable(context)
+            return result == ConnectionResult.SUCCESS
         }
     }
 }

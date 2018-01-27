@@ -12,17 +12,15 @@ import com.zacharee1.boredsigns.util.Utils
 
 class Dev2Widget : AppWidgetProvider() {
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        if (Utils.isBooted(context) && Utils.isAuthed(context)) {
-            context.startService(Intent(context, Dev2Service::class.java))
+        context.startService(Intent(context, Dev2Service::class.java))
 
-            val views = RemoteViews(context.packageName, R.layout.dev2_widget)
+        val views = RemoteViews(context.packageName, R.layout.dev2_widget)
 
-            views.setTextViewText(R.id.cpu, Dev2Service.CPU.toString())
-            views.setTextViewText(R.id.gpu, Dev2Service.GPU.toString())
-            views.setTextViewText(R.id.batt, Dev2Service.BATT.toString())
+        views.setTextViewText(R.id.cpu, Dev2Service.CPU.toString())
+        views.setTextViewText(R.id.gpu, Dev2Service.GPU.toString())
+        views.setTextViewText(R.id.batt, Dev2Service.BATT.toString())
 
-            appWidgetManager.updateAppWidget(appWidgetIds, views)
-        }
+        appWidgetManager.updateAppWidget(appWidgetIds, views)
     }
 
     override fun onDisabled(context: Context?) {

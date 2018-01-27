@@ -46,41 +46,39 @@ class InfoWidget : AppWidgetProvider() {
     private var mOldRanking: NotificationListenerService.RankingMap? = null
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        if (Utils.isAuthed(context) && Utils.isBooted(context)) {
-            for (perm in PermissionsActivity.INFO_REQUEST) {
-                if (context.checkCallingOrSelfPermission(perm) != PackageManager.PERMISSION_GRANTED) {
-                    val intent = Intent(context, PermissionsActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    intent.putExtra("class", this::class.java)
-                    context.startActivity(intent)
-                    return
-                }
-            }
-
-            val enabledListeners = NotificationManagerCompat.getEnabledListenerPackages(context)
-            if (!enabledListeners.contains(context.packageName)) {
-                context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
-                Toast.makeText(context, context.resources.getText(R.string.grant_notification_access), Toast.LENGTH_LONG).show()
+        for (perm in PermissionsActivity.INFO_REQUEST) {
+            if (context.checkCallingOrSelfPermission(perm) != PackageManager.PERMISSION_GRANTED) {
+                val intent = Intent(context, PermissionsActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                intent.putExtra("class", this::class.java)
+                context.startActivity(intent)
                 return
             }
-
-            mPrefs = PreferenceManager.getDefaultSharedPreferences(context)
-
-            val views = RemoteViews(context.packageName, R.layout.info_widget)
-
-            views.setOnClickPendingIntent(R.id.clock, PendingIntent.getBroadcast(context, 0, Intent(InfoService.REFRESH), 0))
-
-            try {
-                updateBattery(views, context)
-                updateClock(views)
-                updateMobile(views, context, appWidgetManager, appWidgetIds)
-                updateWifi(views, context)
-                updateNotifications(views)
-            } catch (e: Exception) {}
-
-            // Instruct the widget manager to update the widget
-            appWidgetManager.updateAppWidget(appWidgetIds, views)
         }
+
+        val enabledListeners = NotificationManagerCompat.getEnabledListenerPackages(context)
+        if (!enabledListeners.contains(context.packageName)) {
+            context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+            Toast.makeText(context, context.resources.getText(R.string.grant_notification_access), Toast.LENGTH_LONG).show()
+            return
+        }
+
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(context)
+
+        val views = RemoteViews(context.packageName, R.layout.info_widget)
+
+        views.setOnClickPendingIntent(R.id.clock, PendingIntent.getBroadcast(context, 0, Intent(InfoService.REFRESH), 0))
+
+        try {
+            updateBattery(views, context)
+            updateClock(views)
+            updateMobile(views, context, appWidgetManager, appWidgetIds)
+            updateWifi(views, context)
+            updateNotifications(views)
+        } catch (e: Exception) {}
+
+        // Instruct the widget manager to update the widget
+        appWidgetManager.updateAppWidget(appWidgetIds, views)
     }
 
     override fun onRestored(context: Context?, oldWidgetIds: IntArray?, newWidgetIds: IntArray?) {
