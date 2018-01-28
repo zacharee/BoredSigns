@@ -17,6 +17,7 @@ import android.preference.PreferenceManager
 import android.support.v4.content.LocalBroadcastManager
 import android.widget.Toast
 import com.google.android.gms.location.*
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.proxies.WeatherProxy
 import com.zacharee1.boredsigns.util.Utils
@@ -155,40 +156,49 @@ class WeatherService : Service() {
     }
 
     private fun getWeather(lat: Double, lon: Double) {
-        val geo = Geocoder(baseContext, Locale.getDefault())
-        val weather = WeatherMap(this, apiKey)
-        val addrs = geo.getFromLocation(lat, lon, 1)
+        try {
+            val geo = Geocoder(applicationContext, Locale.getDefault())
+            val weather = WeatherMap(applicationContext, apiKey)
+            val addrs = geo.getFromLocation(lat, lon, 1)
 
-        weather.getLocationWeather(lat.toString(), lon.toString(), object : WeatherCallback() {
-            @SuppressLint("CheckResult")
-            override fun success(response: WeatherResponseModel?) {
-                val extras = Bundle()
+            weather.getLocationWeather(lat.toString(), lon.toString(), object : WeatherCallback() {
+                @SuppressLint("CheckResult")
+                override fun success(response: WeatherResponseModel?) {
+                    val extras = Bundle()
 
-                val temp = response?.main?.temp
-                val tempDouble: Double = if (useCelsius) TempUnitConverter.convertToCelsius(temp) else TempUnitConverter.convertToFahrenheit(temp)
+                    val temp = response?.main?.temp
+                    val tempDouble: Double = if (useCelsius) TempUnitConverter.convertToCelsius(temp) else TempUnitConverter.convertToFahrenheit(temp)
 
-                val formatted = DecimalFormat("#").format(tempDouble).toString()
+                    val formatted = DecimalFormat("#").format(tempDouble).toString()
 
-                extras.putString(EXTRA_TEMP, formatted + "°" + if (useCelsius) "C" else "F")
-                extras.putString(EXTRA_LOC, addrs[0].locality + ", " + addrs[0].adminArea)
-                extras.putString(EXTRA_DESC, WordUtils.capitalize(response?.weather?.get(0)?.description))
+                    extras.putString(EXTRA_TEMP, formatted + "°" + if (useCelsius) "C" else "F")
+                    extras.putString(EXTRA_LOC, addrs[0].locality + ", " + addrs[0].adminArea)
+                    extras.putString(EXTRA_DESC, WordUtils.capitalize(response?.weather?.get(0)?.description))
 
-                Utils.sendWidgetUpdate(this@WeatherService, WeatherWidget::class.java, extras)
+                    Utils.sendWidgetUpdate(this@WeatherService, WeatherWidget::class.java, extras)
 
-                Observable.fromCallable({asyncLoadUrl(URL(response?.weather?.get(0)?.iconLink))})
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe {
-                            bmp ->
-                            extras.putParcelable(EXTRA_ICON, bmp)
-                            Utils.sendWidgetUpdate(this@WeatherService, WeatherWidget::class.java, extras)
-                        }
-            }
+                    Observable.fromCallable({asyncLoadUrl(URL(response?.weather?.get(0)?.iconLink))})
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe {
+                                bmp ->
+                                extras.putParcelable(EXTRA_ICON, bmp)
+                                Utils.sendWidgetUpdate(this@WeatherService, WeatherWidget::class.java, extras)
+                            }
+                }
 
-            override fun failure(error: String?) {
-                Toast.makeText(this@WeatherService, String.format(Locale.US, resources.getString(R.string.error_retrieving_weather), error), Toast.LENGTH_SHORT).show()
-            }
-        })
+                override fun failure(error: String?) {
+                    Toast.makeText(this@WeatherService, String.format(Locale.US, resources.getString(R.string.error_retrieving_weather), error), Toast.LENGTH_SHORT).show()
+                }
+            })
+        } catch (e: Exception) {
+            e.printStackTrace()
+            val bundle = Bundle()
+            bundle.putString("message", e.localizedMessage)
+            bundle.putString("stacktrace", Arrays.toString(e.stackTrace))
+            FirebaseAnalytics.getInstance(this).logEvent("failed_weather", bundle)
+            Toast.makeText(this, String.format(Locale.US, resources.getString(R.string.error_retrieving_weather), e.localizedMessage), Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun asyncLoadUrl(url: URL): Bitmap? {

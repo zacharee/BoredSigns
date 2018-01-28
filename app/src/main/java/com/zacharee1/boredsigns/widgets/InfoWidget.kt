@@ -18,6 +18,7 @@ import android.graphics.drawable.Drawable
 import android.net.wifi.SupplicantState
 import android.net.wifi.WifiManager
 import android.os.BatteryManager
+import android.os.Bundle
 import android.os.PowerManager
 import android.preference.PreferenceManager
 import android.provider.Settings
@@ -27,6 +28,7 @@ import android.telephony.*
 import android.view.View
 import android.widget.RemoteViews
 import android.widget.Toast
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.zacharee1.boredsigns.services.InfoService
 
 import com.zacharee1.boredsigns.R
@@ -459,7 +461,15 @@ class InfoWidget : AppWidgetProvider() {
 
         init {
             this.level = level
-            icon = context?.packageManager?.getApplicationIcon(packageName)
+            try {
+                icon = context?.packageManager?.getApplicationIcon(packageName)
+            } catch (e: PackageManager.NameNotFoundException) {
+                val bundle = Bundle()
+                bundle.putString("message", e.localizedMessage)
+                bundle.putString("stacktrace", Arrays.toString(e.stackTrace))
+                bundle.putString("package", packageName)
+                FirebaseAnalytics.getInstance(context).logEvent("info_widget_package_error", bundle)
+            }
             this.packageName = packageName
         }
 

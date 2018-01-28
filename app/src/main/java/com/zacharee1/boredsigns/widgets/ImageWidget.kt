@@ -31,8 +31,13 @@ class ImageWidget : AppWidgetProvider() {
         val views = RemoteViews(context.packageName, R.layout.image_widget)
 
         if (uriString != null) {
-            val bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, Uri.parse(uriString))
-            views.setImageViewBitmap(R.id.main, bitmap)
+            try {
+                val bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, Uri.parse(uriString))
+                views.setImageViewBitmap(R.id.main, bitmap)
+            } catch (e: Exception) {
+                prefs.edit().putString("image_picker", null).apply()
+                views.setImageViewResource(R.id.main, R.drawable.example)
+            }
         } else {
             views.setImageViewResource(R.id.main, R.drawable.example)
         }
