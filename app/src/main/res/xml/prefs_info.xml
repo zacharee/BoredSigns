@@ -42,6 +42,11 @@
             android:defaultValue="true"
             android:key="show_percent" />
 
+        <SwitchPreference
+            android:title="Show Icon"
+            android:defaultValue="true"
+            android:key="show_batt_icon" />
+
         <com.jaredrummler.android.colorpicker.ColorPreference
             android:title="@string/color_title"
             android:defaultValue="-1"

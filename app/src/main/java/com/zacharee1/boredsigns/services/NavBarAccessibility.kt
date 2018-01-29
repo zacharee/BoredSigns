@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.support.v4.content.LocalBroadcastManager
 import android.view.accessibility.AccessibilityEvent
 import com.zacharee1.boredsigns.util.Utils
@@ -24,7 +25,7 @@ class NavBarAccessibility : AccessibilityService() {
     }
 
     private val receiver = object : BroadcastReceiver() {
-        @SuppressLint("WrongConstant")
+        @SuppressLint("WrongConstant", "PrivateApi")
         override fun onReceive(p0: Context, p1: Intent?) {
             val statusBarManager = p0.getSystemService("statusbar")
             val collapsePanels = Class.forName("android.app.StatusBarManager").getMethod("collapsePanels")
@@ -41,7 +42,9 @@ class NavBarAccessibility : AccessibilityService() {
                     performGlobalAction(GLOBAL_ACTION_NOTIFICATIONS)
                 }
 
-                SPLIT -> performGlobalAction(GLOBAL_ACTION_TOGGLE_SPLIT_SCREEN)
+                SPLIT -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    performGlobalAction(GLOBAL_ACTION_TOGGLE_SPLIT_SCREEN)
+                }
 
                 QS -> {
                     collapsePanels.invoke(statusBarManager)
@@ -83,6 +86,8 @@ class NavBarAccessibility : AccessibilityService() {
     override fun onDestroy() {
         super.onDestroy()
 
-        unregisterReceiver(receiver)
+        try {
+            unregisterReceiver(receiver)
+        } catch (e: Exception) {}
     }
 }

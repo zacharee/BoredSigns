@@ -44,7 +44,8 @@ class InfoService : NotificationListenerService() {
                 "mobile_color",
                 "show_wifi",
                 "wifi_color",
-                "show_notifs"
+                "show_notifs",
+                "show_batt_icon"
         )
 
         var INTENTS = mutableListOf(

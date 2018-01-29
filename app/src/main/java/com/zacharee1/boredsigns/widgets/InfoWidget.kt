@@ -140,25 +140,32 @@ class InfoWidget : AppWidgetProvider() {
         var show = true
         var color = Color.WHITE
         var showPercent = true
+        var showIcon = true
 
         mPrefs?.let {
             show = it.getBoolean("show_battery", true)
             color = it.getInt("battery_color", Color.WHITE)
             showPercent = it.getBoolean("show_percent", true)
+            showIcon = it.getBoolean("show_batt_icon", true)
         }
 
         if (show) {
             mBatteryState.updateState(level, charging)
 
             views.setViewVisibility(R.id.battery, View.VISIBLE)
-            views.setImageViewResource(R.id.battery_view, mBatteryState.imageResource)
 
-            views.setInt(R.id.battery_view, "setColorFilter", color)
-            views.setTextColor(R.id.battery_percent, color)
+            if (showIcon) {
+                views.setViewVisibility(R.id.battery_view, View.VISIBLE)
+                views.setImageViewResource(R.id.battery_view, mBatteryState.imageResource)
+                views.setInt(R.id.battery_view, "setColorFilter", color)
+            } else {
+                views.setViewVisibility(R.id.battery_view, View.GONE)
+            }
 
             if (showPercent) {
                 views.setViewVisibility(R.id.battery_percent, View.VISIBLE)
                 views.setTextViewText(R.id.battery_percent, mBatteryState.percent.toString() + "%")
+                views.setTextColor(R.id.battery_percent, color)
             } else {
                 views.setViewVisibility(R.id.battery_percent, View.GONE)
             }

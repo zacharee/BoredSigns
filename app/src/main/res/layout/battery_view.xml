@@ -1,28 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:layout_gravity="center"
-    android:foregroundGravity="center"
+    android:gravity="center_vertical"
     android:orientation="vertical"
     android:padding="2dp">
 
     <ImageView
         android:id="@+id/battery_view"
-        android:layout_width="90px"
+        android:layout_width="100px"
         android:layout_height="0dp"
         android:layout_gravity="center"
         android:layout_weight="1"
-        android:scaleType="fitCenter"
+        android:paddingLeft="7px"
+        android:paddingRight="7px"
         android:tint="#fff"
         app:srcCompat="@drawable/ic_battery_alert_black_24dp" />
 
     <TextView
         android:id="@+id/battery_percent"
-        android:layout_width="wrap_content"
+        android:layout_width="100px"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textAlignment="center"
         android:textColor="#fff"
         android:textSize="40px" />
 </LinearLayout>
