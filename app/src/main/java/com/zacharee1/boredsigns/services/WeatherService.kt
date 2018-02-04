@@ -5,13 +5,13 @@ import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.app.Service
+import android.appwidget.AppWidgetManager
 import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.location.Geocoder
 import android.location.Location
-import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.IBinder
@@ -24,10 +24,14 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.proxies.WeatherProxy
 import com.zacharee1.boredsigns.util.Utils
+import com.zacharee1.boredsigns.widgets.InfoWidget
+import com.zacharee1.boredsigns.widgets.WeatherForecastWidget
 import com.zacharee1.boredsigns.widgets.WeatherWidget
+import github.vatsal.easyweather.Helper.ForecastCallback
 import github.vatsal.easyweather.Helper.TempUnitConverter
 import github.vatsal.easyweather.Helper.WeatherCallback
 import github.vatsal.easyweather.WeatherMap
+import github.vatsal.easyweather.retrofit.models.ForecastResponseModel
 import github.vatsal.easyweather.retrofit.models.WeatherResponseModel
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -37,6 +41,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.text.DecimalFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class WeatherService : Service() {
     companion object {
@@ -176,36 +181,82 @@ class WeatherService : Service() {
             val weather = WeatherMap(applicationContext, apiKey)
             val addrs = geo.getFromLocation(lat, lon, 1)
 
-            weather.getLocationWeather(lat.toString(), lon.toString(), object : WeatherCallback() {
-                @SuppressLint("CheckResult")
-                override fun success(response: WeatherResponseModel?) {
-                    val extras = Bundle()
+            if (isCurrentActivated()) {
+                weather.getLocationWeather(lat.toString(), lon.toString(), object : WeatherCallback() {
+                    @SuppressLint("CheckResult")
+                    override fun success(response: WeatherResponseModel?) {
+                        val extras = Bundle()
 
-                    val temp = response?.main?.temp
-                    val tempDouble: Double = if (useCelsius) TempUnitConverter.convertToCelsius(temp) else TempUnitConverter.convertToFahrenheit(temp)
+                        val temp = response?.main?.temp
+                        val tempDouble: Double = if (useCelsius) TempUnitConverter.convertToCelsius(temp) else TempUnitConverter.convertToFahrenheit(temp)
 
-                    val formatted = DecimalFormat("#").format(tempDouble).toString()
+                        val formatted = DecimalFormat("#").format(tempDouble).toString()
 
-                    extras.putString(EXTRA_TEMP, formatted + "°" + if (useCelsius) "C" else "F")
-                    extras.putString(EXTRA_LOC, addrs[0].locality + ", " + addrs[0].adminArea)
-                    extras.putString(EXTRA_DESC, WordUtils.capitalize(response?.weather?.get(0)?.description))
+                        extras.putString(EXTRA_TEMP, formatted + "°" + if (useCelsius) "C" else "F")
+                        extras.putString(EXTRA_LOC, addrs[0].locality + ", " + addrs[0].adminArea)
+                        extras.putString(EXTRA_DESC, WordUtils.capitalize(response?.weather?.get(0)?.description))
 
-                    Utils.sendWidgetUpdate(this@WeatherService, WeatherWidget::class.java, extras)
+                        Utils.sendWidgetUpdate(this@WeatherService, WeatherWidget::class.java, extras)
 
-                    Observable.fromCallable({asyncLoadUrl(URL(response?.weather?.get(0)?.iconLink))})
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe {
-                                bmp ->
-                                extras.putParcelable(EXTRA_ICON, bmp)
-                                Utils.sendWidgetUpdate(this@WeatherService, WeatherWidget::class.java, extras)
-                            }
-                }
+                        Observable.fromCallable({asyncLoadUrl(URL(response?.weather?.get(0)?.iconLink))})
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe {
+                                    bmp ->
+                                    extras.putParcelable(EXTRA_ICON, bmp)
+                                    Utils.sendWidgetUpdate(this@WeatherService, WeatherWidget::class.java, extras)
+                                }
+                    }
 
-                override fun failure(error: String?) {
-                    Toast.makeText(this@WeatherService, String.format(Locale.US, resources.getString(R.string.error_retrieving_weather), error), Toast.LENGTH_SHORT).show()
-                }
-            })
+                    override fun failure(error: String?) {
+                        Toast.makeText(this@WeatherService, String.format(Locale.US, resources.getString(R.string.error_retrieving_weather), error), Toast.LENGTH_SHORT).show()
+                    }
+                })
+            }
+
+            if (isForecastActivated()) {
+                weather.getLocationForecast(lat.toString(), lon.toString(), object : ForecastCallback() {
+                    @SuppressLint("CheckResult")
+                    override fun success(model: ForecastResponseModel) {
+                        val extras = Bundle()
+
+                        val temps: ArrayList<String> = ArrayList()
+                        val descs: ArrayList<String> = ArrayList()
+
+                        model.list.mapTo(descs) { WordUtils.capitalize(it.weather[0].description) }
+
+                        model.list
+                                .map { it.main.temp }
+                                .map { if (useCelsius) TempUnitConverter.convertToCelsius(it) else TempUnitConverter.convertToFahrenheit(it) }
+                                .map { DecimalFormat("#").format(it).toString() }
+                                .mapTo(temps) { it + "°" + if (useCelsius) "C" else "F" }
+
+                        extras.putStringArrayList(EXTRA_TEMP, temps)
+                        extras.putStringArrayList(EXTRA_DESC, descs)
+                        extras.putString(EXTRA_LOC, addrs[0].locality + ", " + addrs[0].adminArea)
+
+                        Utils.sendWidgetUpdate(this@WeatherService, WeatherForecastWidget::class.java, extras)
+
+                        var urls = ArrayList<URL>()
+                        model.list.mapTo(urls) { URL(it.weather[0].iconLink) }
+
+                        urls = ArrayList(urls.subList(0, Math.min(urls.size, 5)))
+
+                        Observable.fromCallable({asyncLoadUrls(urls)})
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe {
+                                    list ->
+                                    extras.putParcelableArrayList(EXTRA_ICON, list)
+                                    Utils.sendWidgetUpdate(this@WeatherService, WeatherForecastWidget::class.java, extras)
+                                }
+                    }
+
+                    override fun failure(error: String?) {
+                        Toast.makeText(this@WeatherService, String.format(Locale.US, resources.getString(R.string.error_retrieving_weather), error), Toast.LENGTH_SHORT).show()
+                    }
+                })
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             val bundle = Bundle()
@@ -227,6 +278,14 @@ class WeatherService : Service() {
         }
     }
 
+    private fun asyncLoadUrls(urls: ArrayList<URL>): ArrayList<Bitmap> {
+        val icons = ArrayList<Bitmap>()
+
+        urls.mapTo(icons) { asyncLoadUrl(it) }
+
+        return icons
+    }
+
     private fun startLocationUpdates() {
         if (checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             locClient.requestLocationUpdates(locReq, locCallback, null)
@@ -235,5 +294,19 @@ class WeatherService : Service() {
 
     private fun stopLocationUpdates() {
         locClient.removeLocationUpdates(locCallback)
+    }
+
+    private fun isCurrentActivated(): Boolean {
+        val man = AppWidgetManager.getInstance(this)
+        val ids = man.getAppWidgetIds(ComponentName(this, WeatherWidget::class.java))
+
+        return ids != null && ids.isNotEmpty()
+    }
+
+    private fun isForecastActivated(): Boolean {
+        val man = AppWidgetManager.getInstance(this)
+        val ids = man.getAppWidgetIds(ComponentName(this, WeatherForecastWidget::class.java))
+
+        return ids != null && ids.isNotEmpty()
     }
 }

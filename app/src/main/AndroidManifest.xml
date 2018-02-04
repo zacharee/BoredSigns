@@ -146,6 +146,20 @@
                 android:value="tap_to_configure" />
         </receiver>
         <receiver
+            android:name=".widgets.WeatherForecastWidget"
+            android:label="@string/weather_forecast_widget_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/weather_forecast_widget_info" />
+            <meta-data
+                android:name="com.lge.signboard.widget.description"
+                android:value="tap_to_configure" />
+        </receiver>
+        <receiver
             android:name=".widgets.NavBarWidget"
             android:label="@string/navbar_widget_title">
             <intent-filter>

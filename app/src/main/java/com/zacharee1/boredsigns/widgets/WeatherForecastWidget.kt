@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.support.v4.content.LocalBroadcastManager
 import android.view.View
@@ -16,11 +17,11 @@ import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.activities.PermissionsActivity
 import com.zacharee1.boredsigns.services.WeatherService
 
-class WeatherWidget : AppWidgetProvider() {
-    private var temp: String? = null
+class WeatherForecastWidget : AppWidgetProvider() {
+    private var temp: ArrayList<String> = ArrayList()
     private var loc: String? = null
-    private var desc: String? = null
-    private var icon: Bitmap? = null
+    private var desc: ArrayList<String> = ArrayList()
+    private var icon: ArrayList<Bitmap>? = ArrayList()
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         for (perm in PermissionsActivity.WEATHER_REQUEST) {
@@ -35,7 +36,7 @@ class WeatherWidget : AppWidgetProvider() {
 
         startService(context)
 
-        val views = RemoteViews(context.packageName, R.layout.weather_widget)
+        val views = RemoteViews(context.packageName, R.layout.weather_forecast_widget)
 
         val intent = Intent(context, WeatherService::class.java)
         intent.action = WeatherService.ACTION_UPDATE_WEATHER
@@ -52,10 +53,10 @@ class WeatherWidget : AppWidgetProvider() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         intent?.let {
-            val t = it.getStringExtra(WeatherService.EXTRA_TEMP)
+            val t = it.getStringArrayListExtra(WeatherService.EXTRA_TEMP)
             val l = it.getStringExtra(WeatherService.EXTRA_LOC)
-            val d = it.getStringExtra(WeatherService.EXTRA_DESC)
-            val i = it.getParcelableExtra(WeatherService.EXTRA_ICON) as Bitmap?
+            val d = it.getStringArrayListExtra(WeatherService.EXTRA_DESC)
+            val i = it.getParcelableArrayListExtra<Bitmap>(WeatherService.EXTRA_ICON)
             if (t != null && l != null && d != null) {
                 temp = t
                 loc = l
@@ -97,16 +98,28 @@ class WeatherWidget : AppWidgetProvider() {
     }
 
     private fun setThings(views: RemoteViews, context: Context) {
-        if (desc == null || loc == null || temp == null) {
+        if (desc.isEmpty() || loc == null || temp.isEmpty()) {
             sendUpdate(context)
         }
         else {
             views.setViewVisibility(R.id.loading, View.GONE)
             views.setViewVisibility(R.id.refresh, View.VISIBLE)
-            views.setImageViewBitmap(R.id.icon, icon)
-            views.setTextViewText(R.id.title, desc)
+
+            val defBmp = BitmapFactory.decodeResource(context.resources, R.drawable.ic_wb_sunny_black_24dp)
+
+            views.setImageViewBitmap(R.id.icon_1, icon?.get(0) ?: defBmp)
+            views.setImageViewBitmap(R.id.icon_2, icon?.get(1) ?: defBmp)
+            views.setImageViewBitmap(R.id.icon_3, icon?.get(2) ?: defBmp)
+            views.setImageViewBitmap(R.id.icon_4, icon?.get(3) ?: defBmp)
+            views.setImageViewBitmap(R.id.icon_5, icon?.get(4) ?: defBmp)
+
             views.setTextViewText(R.id.location, loc)
-            views.setTextViewText(R.id.temp, temp)
+
+            views.setTextViewText(R.id.temp_1, temp[0])
+            views.setTextViewText(R.id.temp_2, temp[1])
+            views.setTextViewText(R.id.temp_3, temp[2])
+            views.setTextViewText(R.id.temp_4, temp[3])
+            views.setTextViewText(R.id.temp_5, temp[4])
         }
     }
 
