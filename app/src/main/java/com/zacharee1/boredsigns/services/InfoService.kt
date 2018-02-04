@@ -1,12 +1,14 @@
 package com.zacharee1.boredsigns.services
 
 import android.app.Notification
+import android.app.NotificationManager
 import android.content.*
 import android.preference.PreferenceManager
 import com.zacharee1.boredsigns.widgets.InfoWidget
 import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.content.ComponentName
+import android.graphics.drawable.Icon
 import android.net.ConnectivityManager
 import android.net.wifi.WifiManager
 import android.os.Bundle
@@ -16,6 +18,7 @@ import android.telephony.PhoneStateListener
 import android.telephony.SignalStrength
 import android.telephony.TelephonyManager
 import android.util.Log
+import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.util.Utils
 
 
@@ -106,7 +109,11 @@ class InfoService : NotificationListenerService() {
     override fun onCreate() {
         super.onCreate()
 
-        startForeground(1337, Notification())
+        startForeground(1337,
+                Notification.Builder(this)
+                        .setSmallIcon(R.mipmap.ic_launcher_boredsigns)
+                        .setPriority(Notification.PRIORITY_MIN)
+                        .build())
 
         if (!shouldAct()) {
             stopForeground(true)
@@ -153,6 +160,7 @@ class InfoService : NotificationListenerService() {
     private fun shouldAct(): Boolean {
         val man = AppWidgetManager.getInstance(this)
         val ids = man.getAppWidgetIds(ComponentName(this, InfoWidget::class.java))
+
         return ids != null && ids.isNotEmpty()
     }
 

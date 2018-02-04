@@ -23,6 +23,7 @@ import android.os.PowerManager
 import android.preference.PreferenceManager
 import android.provider.Settings
 import android.service.notification.NotificationListenerService
+import android.service.notification.StatusBarNotification
 import android.support.v4.app.NotificationManagerCompat
 import android.telephony.*
 import android.view.View
@@ -100,21 +101,18 @@ class InfoWidget : AppWidgetProvider() {
                     mRankedNotifs.clear()
 
                     for (ranking in it.orderedKeys) {
-                        val stuff = ranking.split("|")
-                        val state = NotificationState(context, stuff[1], stuff[0].toInt())
+                        val index = it.orderedKeys.indexOf(ranking)
 
-                        InfoService.NOTIFS?.let {
-                            for (notif in it) {
-                                if (stuff[1] == notif?.packageName) {
-                                    if (notif.isOngoing) {
-                                        state.show = false
-                                    }
-                                    state.icon = notif.notification.smallIcon?.loadDrawable(context)
-                                }
-                            }
-                        }
+                        val rankInfo: NotificationListenerService.Ranking = NotificationListenerService.Ranking()
+                        it.getRanking(ranking, rankInfo)
 
-                        if (!mRankedNotifs.contains(state) && state.show) {
+                        val notif = InfoService.NOTIFS?.get(index)
+
+                        val state = NotificationState(context, notif, rankInfo)
+
+                        state.icon = notif?.notification?.smallIcon?.loadDrawable(context)
+
+                        if (state.show) {
                             mRankedNotifs.add(state)
                         }
                     }
@@ -426,16 +424,16 @@ class InfoWidget : AppWidgetProvider() {
             this.connected = connected
             this.type = type
 
-            when (level) {
-                -3 -> imageResource = R.drawable.ic_airplanemode_active_black_24dp
-                -2 -> imageResource = R.drawable.ic_signal_cellular_no_sim_black_24dp
-                -1 -> imageResource = R.drawable.ic_signal_cellular_null_black_24dp
-                0 -> imageResource = if (connected) R.drawable.ic_signal_cellular_0_bar_black_24dp else R.drawable.ic_signal_cellular_connected_no_internet_0_bar_black_24dp
-                1 -> imageResource = if (connected) R.drawable.ic_signal_cellular_1_bar_black_24dp else R.drawable.ic_signal_cellular_connected_no_internet_1_bar_black_24dp
-                2 -> imageResource = if (connected) R.drawable.ic_signal_cellular_2_bar_black_24dp else R.drawable.ic_signal_cellular_connected_no_internet_2_bar_black_24dp
-                3 -> imageResource = if (connected) R.drawable.ic_signal_cellular_3_bar_black_24dp else R.drawable.ic_signal_cellular_connected_no_internet_3_bar_black_24dp
-                4 -> imageResource = if (connected) R.drawable.ic_signal_cellular_4_bar_black_24dp else R.drawable.ic_signal_cellular_connected_no_internet_4_bar_black_24dp
-                else -> imageResource = R.drawable.ic_signal_cellular_null_black_24dp
+            imageResource = when (level) {
+                -3 -> R.drawable.ic_airplanemode_active_black_24dp
+                -2 -> R.drawable.ic_signal_cellular_no_sim_black_24dp
+                -1 -> R.drawable.ic_signal_cellular_null_black_24dp
+                0 -> if (connected) R.drawable.ic_signal_cellular_0_bar_black_24dp else R.drawable.ic_signal_cellular_connected_no_internet_0_bar_black_24dp
+                1 -> if (connected) R.drawable.ic_signal_cellular_1_bar_black_24dp else R.drawable.ic_signal_cellular_connected_no_internet_1_bar_black_24dp
+                2 -> if (connected) R.drawable.ic_signal_cellular_2_bar_black_24dp else R.drawable.ic_signal_cellular_connected_no_internet_2_bar_black_24dp
+                3 -> if (connected) R.drawable.ic_signal_cellular_3_bar_black_24dp else R.drawable.ic_signal_cellular_connected_no_internet_3_bar_black_24dp
+                4 -> if (connected) R.drawable.ic_signal_cellular_4_bar_black_24dp else R.drawable.ic_signal_cellular_connected_no_internet_4_bar_black_24dp
+                else -> R.drawable.ic_signal_cellular_null_black_24dp
             }
         }
     }
@@ -462,40 +460,36 @@ class InfoWidget : AppWidgetProvider() {
         }
     }
 
-    class NotificationState(context: Context?, packageName: String, level: Int) {
-        var level: Int = -1
-        var show: Boolean = level > Notification.PRIORITY_MIN
+    class NotificationState(context: Context?, private val notification: StatusBarNotification?, val info: NotificationListenerService.Ranking) {
+        var show: Boolean = info.importance > NotificationManager.IMPORTANCE_MIN
         var icon: Drawable? = context?.resources?.getDrawable(R.drawable.ic_android_black_24dp, null)
-        var packageName: String? = null
 
         init {
-            this.level = level
             try {
-                icon = context?.packageManager?.getApplicationIcon(packageName)
+                icon = notification?.notification?.smallIcon?.loadDrawable(context)
             } catch (e: PackageManager.NameNotFoundException) {
                 val bundle = Bundle()
                 bundle.putString("message", e.localizedMessage)
                 bundle.putString("stacktrace", Arrays.toString(e.stackTrace))
-                bundle.putString("package", packageName)
+                bundle.putString("package", notification?.packageName)
                 FirebaseAnalytics.getInstance(context).logEvent("info_widget_package_error", bundle)
             }
-            this.packageName = packageName
         }
 
         override fun equals(other: Any?): Boolean {
             if (other is NotificationState) {
-                return packageName == other.packageName
+                return notification?.packageName == other.notification?.packageName
             }
 
             return false
         }
 
         override fun hashCode(): Int {
-            return level.hashCode() + show.hashCode() + if (icon == null) 0 else (icon as Drawable).hashCode()
+            return info.importance.hashCode() + show.hashCode() + if (icon == null) 0 else (icon as Drawable).hashCode()
         }
 
         override fun toString(): String {
-            return "[ level: " + level + " show: " + show + " package: " + packageName + " ]"
+            return "[ level: " + info.importance + " show: " + show + " package: " + notification?.packageName + " ]"
         }
     }
 }

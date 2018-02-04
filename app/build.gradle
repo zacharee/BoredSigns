@@ -6,7 +6,7 @@ apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'io.fabric'
 
-project.ext.version = 14
+project.ext.version = 15
 
 android {
     compileSdkVersion 27
