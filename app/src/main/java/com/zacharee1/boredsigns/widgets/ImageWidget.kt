@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.preference.PreferenceManager
 import android.provider.MediaStore
@@ -32,7 +33,12 @@ class ImageWidget : AppWidgetProvider() {
 
         if (uriString != null) {
             try {
-                val bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, Uri.parse(uriString))
+                val stream = context.contentResolver.openInputStream(Uri.parse(uriString))
+                val options = BitmapFactory.Options()
+                options.outHeight = 160
+                options.outWidth = 1040
+                val bitmap = BitmapFactory.decodeStream(stream, null, options)
+
                 views.setImageViewBitmap(R.id.main, bitmap)
             } catch (e: Exception) {
                 prefs.edit().putString("image_picker", null).apply()

@@ -60,7 +60,9 @@ class InfoWidget : AppWidgetProvider() {
 
         val enabledListeners = NotificationManagerCompat.getEnabledListenerPackages(context)
         if (!enabledListeners.contains(context.packageName)) {
-            context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+            val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(intent)
             Toast.makeText(context, context.resources.getText(R.string.grant_notification_access), Toast.LENGTH_LONG).show()
             return
         }

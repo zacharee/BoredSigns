@@ -2,6 +2,8 @@ package com.zacharee1.boredsigns.services
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.*
 import android.content.pm.PackageManager
@@ -13,6 +15,7 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.IBinder
+import android.os.SystemClock
 import android.preference.PreferenceManager
 import android.support.v4.content.LocalBroadcastManager
 import android.widget.Toast
@@ -51,6 +54,9 @@ class WeatherService : Service() {
     private lateinit var prefs: SharedPreferences
 
     private lateinit var locClient: FusedLocationProviderClient
+    private lateinit var alarmManager: AlarmManager
+
+    private lateinit var alarmIntent: PendingIntent
 
     private val locReq: LocationRequest = LocationRequest().setSmallestDisplacement(300F)
     private val locCallback: LocationCallback = object : LocationCallback() {
@@ -92,6 +98,13 @@ class WeatherService : Service() {
         prefs = PreferenceManager.getDefaultSharedPreferences(this)
         prefs.registerOnSharedPreferenceChangeListener(prefsListener)
         locClient = LocationServices.getFusedLocationProviderClient(this)
+        alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmIntent = PendingIntent.getService(this, 0, Intent(this, this::class.java), 0)
+
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() + 7200 * 1000,
+                7200 * 1000,
+                alarmIntent)
 
         if (checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             val locMan = getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -123,6 +136,7 @@ class WeatherService : Service() {
         stopLocationUpdates()
         prefs.unregisterOnSharedPreferenceChangeListener(prefsListener)
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
+        alarmManager.cancel(alarmIntent)
     }
 
     private fun onHandleIntent(action: String?) {
@@ -132,6 +146,7 @@ class WeatherService : Service() {
 
                 if (apiKey == null) {
                     val intent = Intent(this, WeatherProxy::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     startActivity(intent)
 
                     Toast.makeText(this, resources.getText(R.string.add_owm_key), Toast.LENGTH_SHORT).show()
@@ -201,14 +216,14 @@ class WeatherService : Service() {
         }
     }
 
-    private fun asyncLoadUrl(url: URL): Bitmap? {
+    private fun asyncLoadUrl(url: URL): Bitmap {
         return try {
             val connection = url.openConnection() as HttpURLConnection
             connection.doInput = true
             connection.connect()
-            BitmapFactory.decodeStream(connection.inputStream)
+            BitmapFactory.decodeStream(connection.inputStream) ?: throw Exception()
         } catch (e: Exception) {
-            null
+            BitmapFactory.decodeResource(resources, R.drawable.ic_wb_sunny_black_24dp)
         }
     }
 
