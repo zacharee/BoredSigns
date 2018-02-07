@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <uses-feature
         android:name="android.hardware.location.network"
@@ -21,8 +22,8 @@
         android:name="android.hardware.location.gps"
         android:required="false" />
 
-    <!--IMPORTANT!!-->
-    <!--Remove the android:name attribute below before attempting to build!-->
+    <!-- IMPORTANT!! -->
+    <!-- Remove the android:name attribute below before attempting to build! -->
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -183,9 +184,9 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/dev1_widget_info" />
-             <meta-data
-             android:name="com.lge.signboard.widget.description"
-             android:value="dev_widget_1_desc" />
+            <meta-data
+                android:name="com.lge.signboard.widget.description"
+                android:value="dev_widget_1_desc" />
         </receiver>
         <receiver
             android:name=".widgets.Dev2Widget"
@@ -226,9 +227,9 @@
             android:exported="false" />
         <service
             android:name=".services.NavBarAccessibility"
+            android:description="@string/accessibility_service"
             android:enabled="true"
             android:exported="true"
-            android:description="@string/accessibility_service"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
@@ -237,11 +238,11 @@
         <service
             android:name=".services.Dev1Service"
             android:enabled="true"
-            android:exported="true"/>
+            android:exported="true" />
         <service
             android:name=".services.Dev2Service"
             android:enabled="true"
-            android:exported="true"/>
+            android:exported="true" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

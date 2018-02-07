@@ -107,7 +107,7 @@ class Dev1Service : Service() {
 
             FPS = answer.value
             USED_MEM = memInfo.totalMem / 0x100000L - memInfo.availMem / 0x100000L
-            CHARGE_RATE = batMan.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW) / 1000
+            CHARGE_RATE = -batMan.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW) / 1000
 
             Utils.sendWidgetUpdate(context, Dev1Widget::class.java, null)
 

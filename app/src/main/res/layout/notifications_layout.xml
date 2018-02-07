@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:layout_gravity="center_vertical"
     android:gravity="center_vertical"
-    android:padding="2dp">
+    android:padding="2dp"
+    android:layoutDirection="ltr">
 
     <LinearLayout
         android:id="@+id/notifications_view"

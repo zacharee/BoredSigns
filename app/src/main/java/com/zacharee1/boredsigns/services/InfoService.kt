@@ -158,10 +158,7 @@ class InfoService : NotificationListenerService() {
     }
 
     private fun shouldAct(): Boolean {
-        val man = AppWidgetManager.getInstance(this)
-        val ids = man.getAppWidgetIds(ComponentName(this, InfoWidget::class.java))
-
-        return ids != null && ids.isNotEmpty()
+        return Utils.isWidgetInUse(InfoWidget::class.java, this)
     }
 
     private fun sendUpdateBroadcast(extras: Bundle?) {

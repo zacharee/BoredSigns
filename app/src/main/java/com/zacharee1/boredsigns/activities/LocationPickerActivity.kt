@@ -10,6 +10,7 @@ import android.support.v4.content.LocalBroadcastManager
 import com.google.android.gms.location.places.ui.PlacePicker
 import com.zacharee1.boredsigns.services.WeatherService
 import com.zacharee1.boredsigns.util.Utils
+import com.zacharee1.boredsigns.widgets.WeatherForecastWidget
 import com.zacharee1.boredsigns.widgets.WeatherWidget
 
 class LocationPickerActivity : AppCompatActivity() {
@@ -35,7 +36,8 @@ class LocationPickerActivity : AppCompatActivity() {
                     it.putFloat("weather_lon", place.latLng.longitude.toFloat())
                 }.apply()
 
-                Utils.sendWidgetUpdate(this, WeatherWidget::class.java, null)
+                if (Utils.isWidgetInUse(WeatherWidget::class.java, this)) Utils.sendWidgetUpdate(this, WeatherWidget::class.java, null)
+                if (Utils.isWidgetInUse(WeatherForecastWidget::class.java, this)) Utils.sendWidgetUpdate(this, WeatherForecastWidget::class.java, null)
             }
         }
 

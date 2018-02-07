@@ -12,6 +12,7 @@ import android.preference.SwitchPreference
 import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.activities.LocationPickerActivity
 import com.zacharee1.boredsigns.util.Utils
+import com.zacharee1.boredsigns.widgets.WeatherForecastWidget
 import com.zacharee1.boredsigns.widgets.WeatherWidget
 
 class WeatherFragment : PreferenceFragment() {
@@ -54,7 +55,8 @@ class WeatherFragment : PreferenceFragment() {
                 extras.putBoolean("weather_unit", !(any as Boolean))
             }
 
-            Utils.sendWidgetUpdate(context, WeatherWidget::class.java, extras)
+            if (Utils.isWidgetInUse(WeatherWidget::class.java, context)) Utils.sendWidgetUpdate(context, WeatherWidget::class.java, extras)
+            if (Utils.isWidgetInUse(WeatherForecastWidget::class.java, context)) Utils.sendWidgetUpdate(context, WeatherForecastWidget::class.java, extras)
 
             if (pref.key == "use_location") {
                 pickLocation.isEnabled = !(any as Boolean)

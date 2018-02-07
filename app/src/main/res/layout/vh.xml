@@ -5,7 +5,8 @@
     android:layout_height="64dp"
     android:layout_marginBottom="2dp"
     android:layout_marginTop="2dp"
-    android:elevation="4dp">
+    android:elevation="4dp"
+    android:layoutDirection="ltr">
 
     <TextView
         android:id="@+id/text"

@@ -2,15 +2,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="1040px"
-    android:layout_height="160px">
+    android:layout_height="160px"
+    android:layoutDirection="ltr">
 
     <ImageView
         android:id="@+id/icon"
         android:layout_width="150px"
         android:layout_height="match_parent"
+        android:layout_above="@+id/time"
         android:layout_alignParentLeft="true"
         android:paddingLeft="12px"
-        android:paddingRight="12px" />
+        android:paddingRight="12px"
+        app:srcCompat="@drawable/ic_wb_sunny_white_24dp" />
 
     <TextView
         android:id="@+id/title"
@@ -27,27 +30,41 @@
         android:layout_width="600px"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:textColor="#fff"
         android:layout_below="@id/title"
         android:layout_toRightOf="@id/icon"
         android:ellipsize="marquee"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:freezesText="true"
+        android:gravity="bottom"
         android:marqueeRepeatLimit="marquee_forever"
         android:scrollHorizontally="true"
         android:singleLine="true"
         android:text="Philadelphia, PA"
+        android:textColor="#fff"
         android:textSize="40px" />
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="150px"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:gravity="center"
+        android:singleLine="true"
+        android:text="12:00PM"
+        android:textAlignment="center"
+        android:textColor="#fff"
+        android:textSize="32px" />
 
     <ProgressBar
         android:id="@+id/loading"
-        android:indeterminateTint="#fff"
         android:layout_width="100px"
         android:layout_height="wrap_content"
-        android:layout_above="@id/owm"
+        android:layout_above="@+id/owm"
         android:layout_toLeftOf="@id/temp"
-        android:indeterminate="true" />
+        android:indeterminate="true"
+        android:indeterminateTint="#fff" />
 
     <ImageView
         android:focusable="true"
@@ -79,10 +96,11 @@
         android:layout_alignBottom="@id/temp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_toRightOf="@id/location"
+        android:layout_toRightOf="@+id/location"
+        android:paddingTop="32px"
         android:scaleType="fitCenter"
-        android:tint="#fff"
         android:src="@drawable/openweathermap_attr"
-        android:textAlignment="viewEnd" />
+        android:textAlignment="viewEnd"
+        android:tint="#fff" />
 
 </RelativeLayout>

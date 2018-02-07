@@ -5,7 +5,6 @@ import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.app.Service
-import android.appwidget.AppWidgetManager
 import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -24,22 +23,27 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.proxies.WeatherProxy
 import com.zacharee1.boredsigns.util.Utils
-import com.zacharee1.boredsigns.widgets.InfoWidget
 import com.zacharee1.boredsigns.widgets.WeatherForecastWidget
 import com.zacharee1.boredsigns.widgets.WeatherWidget
-import github.vatsal.easyweather.Helper.ForecastCallback
 import github.vatsal.easyweather.Helper.TempUnitConverter
 import github.vatsal.easyweather.Helper.WeatherCallback
 import github.vatsal.easyweather.WeatherMap
-import github.vatsal.easyweather.retrofit.models.ForecastResponseModel
-import github.vatsal.easyweather.retrofit.models.WeatherResponseModel
+import github.vatsal.easyweather.retrofit.models.*
+import github.vatsal.easyweather.retrofit.models.List
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.apache.commons.text.WordUtils
+import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.FileNotFoundException
+import java.io.IOException
+import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import java.nio.charset.Charset
 import java.text.DecimalFormat
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -48,9 +52,11 @@ class WeatherService : Service() {
         const val ACTION_UPDATE_WEATHER = "com.zacharee1.boredsigns.action.UPDATE_WEATHER"
 
         const val EXTRA_TEMP = "temp"
+        const val EXTRA_TEMP_EX = "temp_ex"
         const val EXTRA_LOC = "loc"
         const val EXTRA_DESC = "desc"
         const val EXTRA_ICON = "icon"
+        const val EXTRA_TIME = "time"
 
         const val WHICH_UNIT = "weather_unit"
     }
@@ -184,21 +190,23 @@ class WeatherService : Service() {
             if (isCurrentActivated()) {
                 weather.getLocationWeather(lat.toString(), lon.toString(), object : WeatherCallback() {
                     @SuppressLint("CheckResult")
-                    override fun success(response: WeatherResponseModel?) {
+                    override fun success(response: WeatherResponseModel) {
                         val extras = Bundle()
 
-                        val temp = response?.main?.temp
+                        val temp = response.main.temp
                         val tempDouble: Double = if (useCelsius) TempUnitConverter.convertToCelsius(temp) else TempUnitConverter.convertToFahrenheit(temp)
+                        val time = SimpleDateFormat("h:mm aa", Locale.getDefault()).format(Date(response.dt.toLong() * 1000))
 
                         val formatted = DecimalFormat("#").format(tempDouble).toString()
 
                         extras.putString(EXTRA_TEMP, formatted + "°" + if (useCelsius) "C" else "F")
                         extras.putString(EXTRA_LOC, addrs[0].locality + ", " + addrs[0].adminArea)
-                        extras.putString(EXTRA_DESC, WordUtils.capitalize(response?.weather?.get(0)?.description))
+                        extras.putString(EXTRA_DESC, WordUtils.capitalize(response.weather[0].description))
+                        extras.putString(EXTRA_TIME, time)
 
                         Utils.sendWidgetUpdate(this@WeatherService, WeatherWidget::class.java, extras)
 
-                        Observable.fromCallable({asyncLoadUrl(URL(response?.weather?.get(0)?.iconLink))})
+                        Observable.fromCallable({asyncLoadUrl(URL(response.weather[0].iconLink))})
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe {
@@ -215,32 +223,38 @@ class WeatherService : Service() {
             }
 
             if (isForecastActivated()) {
-                weather.getLocationForecast(lat.toString(), lon.toString(), object : ForecastCallback() {
+                ForecastParser(apiKey).sendRequest(lat.toString(), lon.toString(), object : ForecastCallback {
                     @SuppressLint("CheckResult")
-                    override fun success(model: ForecastResponseModel) {
+                    override fun onSuccess(model: ForecastResponseModel) {
                         val extras = Bundle()
 
-                        val temps: ArrayList<String> = ArrayList()
-                        val descs: ArrayList<String> = ArrayList()
-
-                        model.list.mapTo(descs) { WordUtils.capitalize(it.weather[0].description) }
+                        val highTemps = ArrayList<String>()
+                        val lowTemps = ArrayList<String>()
+                        val times = ArrayList<String>()
 
                         model.list
-                                .map { it.main.temp }
+                                .map { it.main.temp_max }
                                 .map { if (useCelsius) TempUnitConverter.convertToCelsius(it) else TempUnitConverter.convertToFahrenheit(it) }
                                 .map { DecimalFormat("#").format(it).toString() }
-                                .mapTo(temps) { it + "°" + if (useCelsius) "C" else "F" }
+                                .mapTo(highTemps) { it + "°" + if (useCelsius) "C" else "F" }
 
-                        extras.putStringArrayList(EXTRA_TEMP, temps)
-                        extras.putStringArrayList(EXTRA_DESC, descs)
+                        model.list
+                                .map { it.main.temp_min }
+                                .map { if (useCelsius) TempUnitConverter.convertToCelsius(it) else TempUnitConverter.convertToFahrenheit(it) }
+                                .map { DecimalFormat("#").format(it).toString() }
+                                .mapTo(lowTemps) { it + "°" + if (useCelsius) "C" else "F" }
+
+                        model.list.mapTo(times) { SimpleDateFormat("M/d", Locale.getDefault()).format(Date(it.dt.toLong() * 1000)) }
+
+                        extras.putStringArrayList(EXTRA_TEMP, highTemps)
+                        extras.putStringArrayList(EXTRA_TEMP_EX, lowTemps)
                         extras.putString(EXTRA_LOC, addrs[0].locality + ", " + addrs[0].adminArea)
+                        extras.putStringArrayList(EXTRA_TIME, times)
 
                         Utils.sendWidgetUpdate(this@WeatherService, WeatherForecastWidget::class.java, extras)
 
-                        var urls = ArrayList<URL>()
+                        val urls = ArrayList<URL>()
                         model.list.mapTo(urls) { URL(it.weather[0].iconLink) }
-
-                        urls = ArrayList(urls.subList(0, Math.min(urls.size, 5)))
 
                         Observable.fromCallable({asyncLoadUrls(urls)})
                                 .subscribeOn(Schedulers.io())
@@ -249,11 +263,10 @@ class WeatherService : Service() {
                                     list ->
                                     extras.putParcelableArrayList(EXTRA_ICON, list)
                                     Utils.sendWidgetUpdate(this@WeatherService, WeatherForecastWidget::class.java, extras)
-                                }
-                    }
+                                }                    }
 
-                    override fun failure(error: String?) {
-                        Toast.makeText(this@WeatherService, String.format(Locale.US, resources.getString(R.string.error_retrieving_weather), error), Toast.LENGTH_SHORT).show()
+                    override fun onFail(message: String) {
+                        Toast.makeText(this@WeatherService, String.format(Locale.US, resources.getString(R.string.error_retrieving_weather), message), Toast.LENGTH_SHORT).show()
                     }
                 })
             }
@@ -272,9 +285,9 @@ class WeatherService : Service() {
             val connection = url.openConnection() as HttpURLConnection
             connection.doInput = true
             connection.connect()
-            BitmapFactory.decodeStream(connection.inputStream) ?: throw Exception()
+            Utils.trimBitmap(BitmapFactory.decodeStream(connection.inputStream)) ?: throw Exception()
         } catch (e: Exception) {
-            BitmapFactory.decodeResource(resources, R.drawable.ic_wb_sunny_black_24dp)
+            Utils.drawableToBitmap(resources.getDrawable(R.drawable.ic_wb_sunny_white_24dp, null))
         }
     }
 
@@ -297,16 +310,105 @@ class WeatherService : Service() {
     }
 
     private fun isCurrentActivated(): Boolean {
-        val man = AppWidgetManager.getInstance(this)
-        val ids = man.getAppWidgetIds(ComponentName(this, WeatherWidget::class.java))
-
-        return ids != null && ids.isNotEmpty()
+        return Utils.isWidgetInUse(WeatherWidget::class.java, this)
     }
 
     private fun isForecastActivated(): Boolean {
-        val man = AppWidgetManager.getInstance(this)
-        val ids = man.getAppWidgetIds(ComponentName(this, WeatherForecastWidget::class.java))
+        return Utils.isWidgetInUse(WeatherForecastWidget::class.java, this)
+    }
 
-        return ids != null && ids.isNotEmpty()
+    class ForecastParser(key: String?) {
+        private val numToGet = 7
+        private val template = "http://api.openweathermap.org/data/2.5/forecast/daily?lat=LAT&lon=LON&cnt=$numToGet&appid=$key"
+
+        @SuppressLint("CheckResult")
+        fun sendRequest(lat: String, lon: String, callback: ForecastCallback) {
+            val req = template.replace("LAT", lat).replace("LON", lon)
+
+            try {
+                Observable.fromCallable({
+                    try {
+                        asyncGetJsonString(URL(req))
+                    } catch (e: FileNotFoundException) {
+                        JSONObject("{\"cod\":429, \"message\": \"Too Many Requests\"}")
+                    } catch (e: IOException) {
+                        val msg = e.localizedMessage
+                        JSONObject("{\"cod\":503, \"message\": \"$msg\"}")
+                    }
+                })
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe {
+                            if (it.has("cod") && it.getString("cod") != "200") {
+                                callback.onFail(it.getString("message"))
+                            } else {
+                                try {
+                                    callback.onSuccess(parseJsonData(it))
+                                } catch (e: Exception) {
+                                    callback.onFail(e.localizedMessage)
+                                }
+                            }
+                        }
+            } catch (e: Exception) {
+                callback.onFail(e.localizedMessage)
+            }
+        }
+
+        private fun parseJsonData(json: JSONObject): ForecastResponseModel {
+            val response = ForecastResponseModel()
+            val list = ArrayList<List>()
+
+            val stuff = json.getJSONArray("list")
+
+            for (i in 0 until stuff.length()) {
+                val l = List()
+                val main = Main()
+                val weather = Weather()
+
+                val s = stuff.getJSONObject(i)
+
+                weather.icon = s.getJSONArray("weather").getJSONObject(0).getString("icon")
+                main.temp_max = s.getJSONObject("temp").getString("max")
+                main.temp_min = s.getJSONObject("temp").getString("min")
+
+                l.weather = arrayOf(weather)
+                l.main = main
+                l.dt = s.getString("dt")
+
+                list.add(l)
+            }
+
+            list.removeAt(0)
+
+            val listArr = arrayOfNulls<List>(list.size)
+            response.list = list.toArray(listArr)
+
+            return response
+        }
+
+        private fun asyncGetJsonString(url: URL): JSONObject{
+            val input = url.openStream()
+
+            input.use { _ ->
+                val reader = BufferedReader(InputStreamReader(input, Charset.forName("UTF-8")))
+
+                val text = StringBuilder()
+                var cp: Int
+
+                do {
+                    cp = reader.read()
+                    if (cp == -1) break
+
+                    text.append(cp.toChar())
+                } while (true)
+
+                return JSONObject(text.toString())
+            }
+        }
+    }
+
+    interface ForecastCallback {
+        fun onSuccess(model: ForecastResponseModel)
+        fun onFail(message: String)
     }
 }

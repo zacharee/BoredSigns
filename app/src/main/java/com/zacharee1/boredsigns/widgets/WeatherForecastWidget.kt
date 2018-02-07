@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.support.v4.content.LocalBroadcastManager
 import android.view.View
@@ -16,12 +15,14 @@ import android.widget.RemoteViews
 import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.activities.PermissionsActivity
 import com.zacharee1.boredsigns.services.WeatherService
+import com.zacharee1.boredsigns.util.Utils
 
 class WeatherForecastWidget : AppWidgetProvider() {
-    private var temp: ArrayList<String> = ArrayList()
+    private var tempHigh: ArrayList<String>? = null
+    private var tempLow: ArrayList<String>? = null
     private var loc: String? = null
-    private var desc: ArrayList<String> = ArrayList()
-    private var icon: ArrayList<Bitmap>? = ArrayList()
+    private var icon: ArrayList<Bitmap>? = null
+    private var times: ArrayList<String>? = null
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         for (perm in PermissionsActivity.WEATHER_REQUEST) {
@@ -55,14 +56,15 @@ class WeatherForecastWidget : AppWidgetProvider() {
         intent?.let {
             val t = it.getStringArrayListExtra(WeatherService.EXTRA_TEMP)
             val l = it.getStringExtra(WeatherService.EXTRA_LOC)
-            val d = it.getStringArrayListExtra(WeatherService.EXTRA_DESC)
             val i = it.getParcelableArrayListExtra<Bitmap>(WeatherService.EXTRA_ICON)
-            if (t != null && l != null && d != null) {
-                temp = t
+            val ti = it.getStringArrayListExtra(WeatherService.EXTRA_TIME)
+            val tl = it.getStringArrayListExtra(WeatherService.EXTRA_TEMP_EX)
+            if (t != null && l != null && ti != null && tl != null) {
+                tempHigh = t
                 loc = l
-                desc = d
                 icon = i
-
+                times = ti
+                tempLow = tl
             }
         }
 
@@ -98,28 +100,27 @@ class WeatherForecastWidget : AppWidgetProvider() {
     }
 
     private fun setThings(views: RemoteViews, context: Context) {
-        if (desc.isEmpty() || loc == null || temp.isEmpty()) {
+        if (loc == null || tempHigh == null || times == null || tempLow == null) {
             sendUpdate(context)
-        }
-        else {
+        } else {
             views.setViewVisibility(R.id.loading, View.GONE)
             views.setViewVisibility(R.id.refresh, View.VISIBLE)
 
-            val defBmp = BitmapFactory.decodeResource(context.resources, R.drawable.ic_wb_sunny_black_24dp)
+            val defBmp = Utils.drawableToBitmap(context.resources.getDrawable(R.drawable.ic_wb_sunny_white_24dp, null))
 
-            views.setImageViewBitmap(R.id.icon_1, icon?.get(0) ?: defBmp)
-            views.setImageViewBitmap(R.id.icon_2, icon?.get(1) ?: defBmp)
-            views.setImageViewBitmap(R.id.icon_3, icon?.get(2) ?: defBmp)
-            views.setImageViewBitmap(R.id.icon_4, icon?.get(3) ?: defBmp)
-            views.setImageViewBitmap(R.id.icon_5, icon?.get(4) ?: defBmp)
+            views.removeAllViews(R.id.weather_block_wrap)
+
+            for (i in 0 until (tempLow?.size ?: 5)) {
+                val view = RemoteViews(context.packageName, R.layout.weather_forecast_block)
+                if (icon != null) view.setImageViewBitmap(R.id.icon, icon?.get(i) ?: defBmp)
+                view.setTextViewText(R.id.tempHigh, tempHigh?.get(i))
+                view.setTextViewText(R.id.tempLow, tempLow?.get(i))
+
+                views.addView(R.id.weather_block_wrap, view)
+            }
 
             views.setTextViewText(R.id.location, loc)
-
-            views.setTextViewText(R.id.temp_1, temp[0])
-            views.setTextViewText(R.id.temp_2, temp[1])
-            views.setTextViewText(R.id.temp_3, temp[2])
-            views.setTextViewText(R.id.temp_4, temp[3])
-            views.setTextViewText(R.id.temp_5, temp[4])
+            views.setTextViewText(R.id.dates, (times?.get(0) ?: "1/1") + "–" + (times?.get(times?.lastIndex ?: 0) ?: "1/5"))
         }
     }
 

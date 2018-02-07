@@ -15,11 +15,13 @@ import android.widget.RemoteViews
 import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.activities.PermissionsActivity
 import com.zacharee1.boredsigns.services.WeatherService
+import com.zacharee1.boredsigns.util.Utils
 
 class WeatherWidget : AppWidgetProvider() {
     private var temp: String? = null
     private var loc: String? = null
     private var desc: String? = null
+    private var time: String? = null
     private var icon: Bitmap? = null
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
@@ -56,12 +58,13 @@ class WeatherWidget : AppWidgetProvider() {
             val l = it.getStringExtra(WeatherService.EXTRA_LOC)
             val d = it.getStringExtra(WeatherService.EXTRA_DESC)
             val i = it.getParcelableExtra(WeatherService.EXTRA_ICON) as Bitmap?
-            if (t != null && l != null && d != null) {
+            val ti = it.getStringExtra(WeatherService.EXTRA_TIME)
+            if (t != null && l != null && d != null && ti != null) {
                 temp = t
                 loc = l
                 desc = d
                 icon = i
-
+                time = ti
             }
         }
 
@@ -97,16 +100,17 @@ class WeatherWidget : AppWidgetProvider() {
     }
 
     private fun setThings(views: RemoteViews, context: Context) {
-        if (desc == null || loc == null || temp == null) {
+        if (desc == null || loc == null || temp == null || time == null) {
             sendUpdate(context)
         }
         else {
             views.setViewVisibility(R.id.loading, View.GONE)
             views.setViewVisibility(R.id.refresh, View.VISIBLE)
-            views.setImageViewBitmap(R.id.icon, icon)
+            if (icon != null) views.setImageViewBitmap(R.id.icon, icon ?: Utils.drawableToBitmap(context.resources.getDrawable(R.drawable.ic_wb_sunny_white_24dp, null)))
             views.setTextViewText(R.id.title, desc)
             views.setTextViewText(R.id.location, loc)
             views.setTextViewText(R.id.temp, temp)
+            views.setTextViewText(R.id.time, time)
         }
     }
 

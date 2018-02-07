@@ -5,6 +5,7 @@
     android:layout_height="160px"
     android:foregroundGravity="center"
     android:gravity="center_vertical"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:layoutDirection="ltr">
 
 </LinearLayout>

@@ -6,7 +6,7 @@ apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'io.fabric'
 
-project.ext.version = 15
+project.ext.version = 16
 
 android {
     compileSdkVersion 27
@@ -38,7 +38,6 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.jaredrummler:colorpicker:1.0.1'
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.6.0'
-//    implementation 'zh.wang.android:yweathergetter4a:1.3.0'
     implementation 'com.google.android.gms:play-services-location:11.8.0'
     implementation 'com.google.android.gms:play-services-maps:11.8.0'
     implementation 'com.google.android.gms:play-services-places:11.8.0'
@@ -48,7 +47,6 @@ dependencies {
     }
     implementation 'com.google.firebase:firebase-core:11.8.0'
     implementation 'com.github.javiersantos:PiracyChecker:1.2'
-//    implementation 'com.jmedeisis:draglinearlayout:1.1.0'
     implementation project(':draglinearlayout')
     implementation project(':commons-text-1.2')
     implementation project(':commons-lang3')
