@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.support.v4.content.LocalBroadcastManager
+import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
 
@@ -54,18 +55,11 @@ class WeatherForecastWidget : AppWidgetProvider() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         intent?.let {
-            val t = it.getStringArrayListExtra(WeatherService.EXTRA_TEMP)
-            val l = it.getStringExtra(WeatherService.EXTRA_LOC)
-            val i = it.getParcelableArrayListExtra<Bitmap>(WeatherService.EXTRA_ICON)
-            val ti = it.getStringArrayListExtra(WeatherService.EXTRA_TIME)
-            val tl = it.getStringArrayListExtra(WeatherService.EXTRA_TEMP_EX)
-            if (t != null && l != null && ti != null && tl != null) {
-                tempHigh = t
-                loc = l
-                icon = i
-                times = ti
-                tempLow = tl
-            }
+            tempHigh = it.getStringArrayListExtra(WeatherService.EXTRA_TEMP)
+            loc = it.getStringExtra(WeatherService.EXTRA_LOC)
+            icon = it.getParcelableArrayListExtra<Bitmap>(WeatherService.EXTRA_ICON)
+            times = it.getStringArrayListExtra(WeatherService.EXTRA_TIME)
+            tempLow = it.getStringArrayListExtra(WeatherService.EXTRA_TEMP_EX)
         }
 
         super.onReceive(context, intent)

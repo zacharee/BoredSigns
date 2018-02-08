@@ -54,18 +54,11 @@ class WeatherWidget : AppWidgetProvider() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         intent?.let {
-            val t = it.getStringExtra(WeatherService.EXTRA_TEMP)
-            val l = it.getStringExtra(WeatherService.EXTRA_LOC)
-            val d = it.getStringExtra(WeatherService.EXTRA_DESC)
-            val i = it.getParcelableExtra(WeatherService.EXTRA_ICON) as Bitmap?
-            val ti = it.getStringExtra(WeatherService.EXTRA_TIME)
-            if (t != null && l != null && d != null && ti != null) {
-                temp = t
-                loc = l
-                desc = d
-                icon = i
-                time = ti
-            }
+            temp = it.getStringExtra(WeatherService.EXTRA_TEMP)
+            loc = it.getStringExtra(WeatherService.EXTRA_LOC)
+            desc = it.getStringExtra(WeatherService.EXTRA_DESC)
+            icon = it.getParcelableExtra(WeatherService.EXTRA_ICON)
+            time = it.getStringExtra(WeatherService.EXTRA_TIME)
         }
 
         super.onReceive(context, intent)

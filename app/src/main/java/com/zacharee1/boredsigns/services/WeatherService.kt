@@ -17,6 +17,7 @@ import android.os.IBinder
 import android.os.SystemClock
 import android.preference.PreferenceManager
 import android.support.v4.content.LocalBroadcastManager
+import android.util.Log
 import android.widget.Toast
 import com.google.android.gms.location.*
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -326,16 +327,7 @@ class WeatherService : Service() {
             val req = template.replace("LAT", lat).replace("LON", lon)
 
             try {
-                Observable.fromCallable({
-                    try {
-                        asyncGetJsonString(URL(req))
-                    } catch (e: FileNotFoundException) {
-                        JSONObject("{\"cod\":429, \"message\": \"Too Many Requests\"}")
-                    } catch (e: IOException) {
-                        val msg = e.localizedMessage
-                        JSONObject("{\"cod\":503, \"message\": \"$msg\"}")
-                    }
-                })
+                Observable.fromCallable({asyncGetJsonString(URL(req))})
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
@@ -387,7 +379,18 @@ class WeatherService : Service() {
         }
 
         private fun asyncGetJsonString(url: URL): JSONObject{
-            val input = url.openStream()
+            var connection = url.openConnection() as HttpURLConnection
+
+            if (connection.responseCode != HttpURLConnection.HTTP_OK) {
+                if (connection.responseCode == HttpURLConnection.HTTP_MOVED_TEMP
+                        || connection.responseCode == HttpURLConnection.HTTP_MOVED_PERM
+                        || connection.responseCode == HttpURLConnection.HTTP_SEE_OTHER) {
+                    val newUrl = connection.getHeaderField("Location")
+                    connection = URL(newUrl).openConnection() as HttpURLConnection
+                }
+            }
+
+            val input = if (connection.responseCode < HttpURLConnection.HTTP_BAD_REQUEST) connection.inputStream else connection.errorStream
 
             input.use { _ ->
                 val reader = BufferedReader(InputStreamReader(input, Charset.forName("UTF-8")))
