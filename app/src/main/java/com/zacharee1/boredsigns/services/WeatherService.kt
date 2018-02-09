@@ -21,6 +21,7 @@ import android.util.Log
 import android.widget.Toast
 import com.google.android.gms.location.*
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.zacharee1.boredsigns.App
 import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.proxies.WeatherProxy
 import com.zacharee1.boredsigns.util.Utils
@@ -34,7 +35,6 @@ import github.vatsal.easyweather.retrofit.models.List
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import org.apache.commons.text.WordUtils
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.FileNotFoundException
@@ -51,6 +51,7 @@ import kotlin.collections.ArrayList
 class WeatherService : Service() {
     companion object {
         const val ACTION_UPDATE_WEATHER = "com.zacharee1.boredsigns.action.UPDATE_WEATHER"
+        const val API_KEY = App.API_KEY //IMPORTANT: Use your own OWM API key here when building for yourself!
 
         const val EXTRA_TEMP = "temp"
         const val EXTRA_TEMP_EX = "temp_ex"
@@ -85,30 +86,18 @@ class WeatherService : Service() {
         }
     }
 
-    private var apiKey: String? = null
-
-    private val prefsListener = SharedPreferences.OnSharedPreferenceChangeListener {
-        prefs, s ->
-        if (s == "weather_api_key") {
-            apiKey = prefs.getString("weather_api_key", null)
-            onHandleIntent(ACTION_UPDATE_WEATHER)
-        }
-    }
-
     override fun onBind(p0: Intent?): IBinder? {
         return null
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         onHandleIntent(intent?.action)
-        apiKey = prefs.getString("weather_api_key", null)
         return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onCreate() {
         super.onCreate()
         prefs = PreferenceManager.getDefaultSharedPreferences(this)
-        prefs.registerOnSharedPreferenceChangeListener(prefsListener)
         locClient = LocationServices.getFusedLocationProviderClient(this)
         alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmIntent = PendingIntent.getService(this, 0, Intent(this, this::class.java), 0)
@@ -146,7 +135,6 @@ class WeatherService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         stopLocationUpdates()
-        prefs.unregisterOnSharedPreferenceChangeListener(prefsListener)
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
         alarmManager.cancel(alarmIntent)
     }
@@ -156,25 +144,17 @@ class WeatherService : Service() {
             ACTION_UPDATE_WEATHER -> {
                 useCelsius = prefs.getBoolean(WHICH_UNIT, true)
 
-                if (apiKey == null) {
-                    val intent = Intent(this, WeatherProxy::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    startActivity(intent)
-
-                    Toast.makeText(this, resources.getText(R.string.add_owm_key), Toast.LENGTH_SHORT).show()
-                } else {
-                    val locMan = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-                    if ((!locMan.isProviderEnabled(LocationManager.GPS_PROVIDER) && !locMan.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) || !prefs.getBoolean("use_location", true)) {
-                        val lat = prefs.getFloat("weather_lat", 51.508530F).toDouble()
-                        val lon = prefs.getFloat("weather_lon", -0.076132F).toDouble()
-                        getWeather(lat, lon)
-                    } else if (checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                        locClient.lastLocation.addOnCompleteListener {
-                            it.result?.let {
-                                val lat = it.latitude
-                                val lon = it.longitude
-                                getWeather(lat, lon)
-                            }
+                val locMan = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                if ((!locMan.isProviderEnabled(LocationManager.GPS_PROVIDER) && !locMan.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) || !prefs.getBoolean("use_location", true)) {
+                    val lat = prefs.getFloat("weather_lat", 51.508530F).toDouble()
+                    val lon = prefs.getFloat("weather_lon", -0.076132F).toDouble()
+                    getWeather(lat, lon)
+                } else if (checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    locClient.lastLocation.addOnCompleteListener {
+                        it.result?.let {
+                            val lat = it.latitude
+                            val lon = it.longitude
+                            getWeather(lat, lon)
                         }
                     }
                 }
@@ -185,7 +165,7 @@ class WeatherService : Service() {
     private fun getWeather(lat: Double, lon: Double) {
         try {
             val geo = Geocoder(applicationContext, Locale.getDefault())
-            val weather = WeatherMap(applicationContext, apiKey)
+            val weather = WeatherMap(applicationContext, API_KEY)
             val addrs = geo.getFromLocation(lat, lon, 1)
 
             if (isCurrentActivated()) {
@@ -202,7 +182,7 @@ class WeatherService : Service() {
 
                         extras.putString(EXTRA_TEMP, formatted + "°" + if (useCelsius) "C" else "F")
                         extras.putString(EXTRA_LOC, addrs[0].locality + ", " + addrs[0].adminArea)
-                        extras.putString(EXTRA_DESC, WordUtils.capitalize(response.weather[0].description))
+                        extras.putString(EXTRA_DESC, capitalize(response.weather[0].description))
                         extras.putString(EXTRA_TIME, time)
 
                         Utils.sendWidgetUpdate(this@WeatherService, WeatherWidget::class.java, extras)
@@ -224,7 +204,7 @@ class WeatherService : Service() {
             }
 
             if (isForecastActivated()) {
-                ForecastParser(apiKey).sendRequest(lat.toString(), lon.toString(), object : ForecastCallback {
+                ForecastParser().sendRequest(lat.toString(), lon.toString(), object : ForecastCallback {
                     @SuppressLint("CheckResult")
                     override fun onSuccess(model: ForecastResponseModel) {
                         val extras = Bundle()
@@ -281,6 +261,21 @@ class WeatherService : Service() {
         }
     }
 
+    private fun capitalize(string: String): String {
+        val builder = StringBuilder()
+        val words = string.split(" ")
+
+        for (word in words) {
+            if (builder.isNotEmpty()) {
+                builder.append(" ")
+            }
+
+            builder.append(word[0].toUpperCase()).append(word.substring(1, word.length))
+        }
+
+        return builder.toString()
+    }
+
     private fun asyncLoadUrl(url: URL): Bitmap {
         return try {
             val connection = url.openConnection() as HttpURLConnection
@@ -318,9 +313,9 @@ class WeatherService : Service() {
         return Utils.isWidgetInUse(WeatherForecastWidget::class.java, this)
     }
 
-    class ForecastParser(key: String?) {
+    class ForecastParser() {
         private val numToGet = 7
-        private val template = "http://api.openweathermap.org/data/2.5/forecast/daily?lat=LAT&lon=LON&cnt=$numToGet&appid=$key"
+        private val template = "http://api.openweathermap.org/data/2.5/forecast/daily?lat=LAT&lon=LON&cnt=$numToGet&appid=$API_KEY"
 
         @SuppressLint("CheckResult")
         fun sendRequest(lat: String, lon: String, callback: ForecastCallback) {

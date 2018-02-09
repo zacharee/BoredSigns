@@ -34,8 +34,6 @@
     <string name="reset">Reset</string>
     <string name="edit_screen_on">Edit Screen-On Widgets</string>
     <string name="edit_aod">Edit AOD Widgets</string>
-    <string name="api_key">API Key</string>
-    <string name="get_api_key">Get API Key</string>
     <string name="use_celsius">Use Celsius</string>
     <string name="use_current_location">Use Current Location</string>
     <string name="pick_location">Pick Location</string>
@@ -63,5 +61,4 @@
     <string name="enable_accessibility">Please enable the BoredSigns accessibility service.</string>
     <string name="no_config_activity">No configuration found</string>
     <string name="error_launching_config">Error launching configuration</string>
-    <string name="add_owm_key">Please enter a valid OpenWeatherMap API key.</string>
 </resources>

@@ -1,18 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <EditTextPreference
-        android:title="@string/api_key"
-        android:key="weather_api_key" />
-
-    <Preference
-        android:title="@string/get_api_key"
-        android:key="get_api_key">
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:data="https://home.openweathermap.org/users/sign_up" />
-    </Preference>
-
     <SwitchPreference
         android:title="@string/use_celsius"
         android:key="weather_unit"

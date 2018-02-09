@@ -103,17 +103,21 @@ class InfoWidget : AppWidgetProvider() {
                     for (ranking in it.orderedKeys) {
                         val index = it.orderedKeys.indexOf(ranking)
 
-                        val rankInfo: NotificationListenerService.Ranking = NotificationListenerService.Ranking()
-                        it.getRanking(ranking, rankInfo)
+                        InfoService.NOTIFS?.let {notifs ->
+                            if (index < notifs.size) {
+                                val rankInfo: NotificationListenerService.Ranking = NotificationListenerService.Ranking()
+                                it.getRanking(ranking, rankInfo)
 
-                        val notif = InfoService.NOTIFS?.get(index)
+                                val notif = notifs[index]
 
-                        val state = NotificationState(context, notif, rankInfo)
+                                val state = NotificationState(context, notif, rankInfo)
 
-                        state.icon = notif?.notification?.smallIcon?.loadDrawable(context)
+                                state.icon = notif?.notification?.smallIcon?.loadDrawable(context)
 
-                        if (state.show) {
-                            mRankedNotifs.add(state)
+                                if (state.show) {
+                                    mRankedNotifs.add(state)
+                                }
+                            }
                         }
                     }
                 }

@@ -1,1 +1,1 @@
-include ':app', ':draglinearlayout', ':commons-text-1.2', ':commons-lang3'
+include ':app', ':draglinearlayout'
