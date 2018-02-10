@@ -22,7 +22,7 @@ class WeatherWidget : AppWidgetProvider() {
     private var loc: String? = null
     private var desc: String? = null
     private var time: String? = null
-    private var icon: Bitmap? = null
+    private var icon: Int = R.drawable.sunny
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         for (perm in PermissionsActivity.WEATHER_REQUEST) {
@@ -57,7 +57,7 @@ class WeatherWidget : AppWidgetProvider() {
             temp = it.getStringExtra(WeatherService.EXTRA_TEMP)
             loc = it.getStringExtra(WeatherService.EXTRA_LOC)
             desc = it.getStringExtra(WeatherService.EXTRA_DESC)
-            icon = it.getParcelableExtra(WeatherService.EXTRA_ICON)
+            icon = it.getIntExtra(WeatherService.EXTRA_ICON, R.drawable.sunny)
             time = it.getStringExtra(WeatherService.EXTRA_TIME)
         }
 
@@ -99,7 +99,7 @@ class WeatherWidget : AppWidgetProvider() {
         else {
             views.setViewVisibility(R.id.loading, View.GONE)
             views.setViewVisibility(R.id.refresh, View.VISIBLE)
-            if (icon != null) views.setImageViewBitmap(R.id.icon, icon ?: Utils.drawableToBitmap(context.resources.getDrawable(R.drawable.ic_wb_sunny_white_24dp, null)))
+            views.setImageViewResource(R.id.icon, icon)
             views.setTextViewText(R.id.title, desc)
             views.setTextViewText(R.id.location, loc)
             views.setTextViewText(R.id.temp, temp)

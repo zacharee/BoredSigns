@@ -42,6 +42,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import java.net.UnknownHostException
 import java.nio.charset.Charset
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -100,7 +101,10 @@ class WeatherService : Service() {
         prefs = PreferenceManager.getDefaultSharedPreferences(this)
         locClient = LocationServices.getFusedLocationProviderClient(this)
         alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmIntent = PendingIntent.getService(this, 0, Intent(this, this::class.java), 0)
+
+        val intent = Intent(this, this::class.java)
+        intent.action = ACTION_UPDATE_WEATHER
+        alarmIntent = PendingIntent.getService(this, 0, intent, 0)
 
         alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                 SystemClock.elapsedRealtime() + 7200 * 1000,
@@ -109,7 +113,12 @@ class WeatherService : Service() {
 
         if (checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             val locMan = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            locMan.requestSingleUpdate(LocationManager.GPS_PROVIDER, object : android.location.LocationListener {
+            val provider = when {
+                locMan.isProviderEnabled(LocationManager.NETWORK_PROVIDER) -> LocationManager.NETWORK_PROVIDER
+                locMan.isProviderEnabled(LocationManager.GPS_PROVIDER) -> LocationManager.GPS_PROVIDER
+                else -> LocationManager.PASSIVE_PROVIDER
+            }
+            locMan.requestSingleUpdate(provider, object : android.location.LocationListener {
                 override fun onLocationChanged(p0: Location?) {
                     onHandleIntent(ACTION_UPDATE_WEATHER)
                 }
@@ -184,17 +193,9 @@ class WeatherService : Service() {
                         extras.putString(EXTRA_LOC, addrs[0].locality + ", " + addrs[0].adminArea)
                         extras.putString(EXTRA_DESC, capitalize(response.weather[0].description))
                         extras.putString(EXTRA_TIME, time)
+                        extras.putInt(EXTRA_ICON, Utils.parseWeatherIconCode(response.weather[0].id, response.weather[0].icon))
 
                         Utils.sendWidgetUpdate(this@WeatherService, WeatherWidget::class.java, extras)
-
-                        Observable.fromCallable({asyncLoadUrl(URL(response.weather[0].iconLink))})
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe {
-                                    bmp ->
-                                    extras.putParcelable(EXTRA_ICON, bmp)
-                                    Utils.sendWidgetUpdate(this@WeatherService, WeatherWidget::class.java, extras)
-                                }
                     }
 
                     override fun failure(error: String?) {
@@ -212,6 +213,7 @@ class WeatherService : Service() {
                         val highTemps = ArrayList<String>()
                         val lowTemps = ArrayList<String>()
                         val times = ArrayList<String>()
+                        val icons = ArrayList<Int>()
 
                         model.list
                                 .map { it.main.temp_max }
@@ -227,24 +229,16 @@ class WeatherService : Service() {
 
                         model.list.mapTo(times) { SimpleDateFormat("M/d", Locale.getDefault()).format(Date(it.dt.toLong() * 1000)) }
 
+                        model.list.mapTo(icons) { Utils.parseWeatherIconCode(it.weather[0].id, it.weather[0].icon) }
+
                         extras.putStringArrayList(EXTRA_TEMP, highTemps)
                         extras.putStringArrayList(EXTRA_TEMP_EX, lowTemps)
                         extras.putString(EXTRA_LOC, addrs[0].locality + ", " + addrs[0].adminArea)
                         extras.putStringArrayList(EXTRA_TIME, times)
+                        extras.putIntegerArrayList(EXTRA_ICON, icons)
 
                         Utils.sendWidgetUpdate(this@WeatherService, WeatherForecastWidget::class.java, extras)
-
-                        val urls = ArrayList<URL>()
-                        model.list.mapTo(urls) { URL(it.weather[0].iconLink) }
-
-                        Observable.fromCallable({asyncLoadUrls(urls)})
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe {
-                                    list ->
-                                    extras.putParcelableArrayList(EXTRA_ICON, list)
-                                    Utils.sendWidgetUpdate(this@WeatherService, WeatherForecastWidget::class.java, extras)
-                                }                    }
+                    }
 
                     override fun onFail(message: String) {
                         Toast.makeText(this@WeatherService, String.format(Locale.US, resources.getString(R.string.error_retrieving_weather), message), Toast.LENGTH_SHORT).show()
@@ -274,25 +268,6 @@ class WeatherService : Service() {
         }
 
         return builder.toString()
-    }
-
-    private fun asyncLoadUrl(url: URL): Bitmap {
-        return try {
-            val connection = url.openConnection() as HttpURLConnection
-            connection.doInput = true
-            connection.connect()
-            Utils.trimBitmap(BitmapFactory.decodeStream(connection.inputStream)) ?: throw Exception()
-        } catch (e: Exception) {
-            Utils.drawableToBitmap(resources.getDrawable(R.drawable.ic_wb_sunny_white_24dp, null))
-        }
-    }
-
-    private fun asyncLoadUrls(urls: ArrayList<URL>): ArrayList<Bitmap> {
-        val icons = ArrayList<Bitmap>()
-
-        urls.mapTo(icons) { asyncLoadUrl(it) }
-
-        return icons
     }
 
     private fun startLocationUpdates() {
@@ -355,6 +330,7 @@ class WeatherService : Service() {
                 val s = stuff.getJSONObject(i)
 
                 weather.icon = s.getJSONArray("weather").getJSONObject(0).getString("icon")
+                weather.id = s.getJSONArray("weather").getJSONObject(0).getString("id")
                 main.temp_max = s.getJSONObject("temp").getString("max")
                 main.temp_min = s.getJSONObject("temp").getString("min")
 
@@ -376,31 +352,39 @@ class WeatherService : Service() {
         private fun asyncGetJsonString(url: URL): JSONObject{
             var connection = url.openConnection() as HttpURLConnection
 
-            if (connection.responseCode != HttpURLConnection.HTTP_OK) {
-                if (connection.responseCode == HttpURLConnection.HTTP_MOVED_TEMP
-                        || connection.responseCode == HttpURLConnection.HTTP_MOVED_PERM
-                        || connection.responseCode == HttpURLConnection.HTTP_SEE_OTHER) {
-                    val newUrl = connection.getHeaderField("Location")
-                    connection = URL(newUrl).openConnection() as HttpURLConnection
+            return try {
+                if (connection.responseCode != HttpURLConnection.HTTP_OK) {
+                    if (connection.responseCode == HttpURLConnection.HTTP_MOVED_TEMP
+                            || connection.responseCode == HttpURLConnection.HTTP_MOVED_PERM
+                            || connection.responseCode == HttpURLConnection.HTTP_SEE_OTHER) {
+                        val newUrl = connection.getHeaderField("Location")
+                        connection = URL(newUrl).openConnection() as HttpURLConnection
+                    }
                 }
-            }
 
-            val input = if (connection.responseCode < HttpURLConnection.HTTP_BAD_REQUEST) connection.inputStream else connection.errorStream
+                val input = if (connection.responseCode < HttpURLConnection.HTTP_BAD_REQUEST) connection.inputStream else connection.errorStream
 
-            input.use { _ ->
-                val reader = BufferedReader(InputStreamReader(input, Charset.forName("UTF-8")))
+                input.use { _ ->
+                    val reader = BufferedReader(InputStreamReader(input, Charset.forName("UTF-8")))
 
-                val text = StringBuilder()
-                var cp: Int
+                    val text = StringBuilder()
+                    var cp: Int
 
-                do {
-                    cp = reader.read()
-                    if (cp == -1) break
+                    do {
+                        cp = reader.read()
+                        if (cp == -1) break
 
-                    text.append(cp.toChar())
-                } while (true)
+                        text.append(cp.toChar())
+                    } while (true)
 
-                return JSONObject(text.toString())
+                    return JSONObject(text.toString())
+                }
+            } catch (e: Exception) {
+                if ((e.cause != null && e.cause is UnknownHostException) || e is UnknownHostException) {
+                    JSONObject("{\"cod\":001, \"message\": \"Unknown Host\"}")
+                } else {
+                    throw e
+                }
             }
         }
     }

@@ -25,7 +25,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-
+import com.zacharee1.boredsigns.R
 
 
 class Utils {
@@ -91,6 +91,93 @@ class Utils {
                         maxY - minY + 1
                 )
             } else null
+        }
+
+        fun parseWeatherIconCode(id: String, code: String): Int {
+            val isDay = code.contains("d")
+            return when (id.toInt()) {
+                200 -> R.drawable.storm_5
+                201 -> R.drawable.storm_5
+                202 -> R.drawable.storm_5
+                210 -> R.drawable.storm_1
+                211 -> R.drawable.storm_1
+                212 -> R.drawable.storm_21
+                221 -> if (isDay) R.drawable.storm else R.drawable.storm_12
+                230 -> R.drawable.storm_5
+                231 -> R.drawable.storm_5
+                232 -> R.drawable.storm_5
+
+                300 -> R.drawable.sprinkle_2
+                301 -> R.drawable.sprinkle_2
+                302 -> R.drawable.sprinkle_2
+                310 -> R.drawable.sprinkle_2
+                311 -> R.drawable.sprinkle_2
+                312 -> R.drawable.sprinkle_2
+                313 -> R.drawable.sprinkle_2
+                314 -> if (isDay) R.drawable.sprinkle else R.drawable.sprinkle_1
+                321 -> if (isDay) R.drawable.sprinkle else R.drawable.sprinkle_1
+
+                500 -> R.drawable.sprinkle_2
+                501 -> R.drawable.rain_3
+                502 -> R.drawable.rain_3
+                503 -> R.drawable.rain_3
+                504 -> R.drawable.rain_3
+                511 -> R.drawable.sleet_2
+                520 -> if (isDay) R.drawable.sprinkle else R.drawable.sprinkle_1
+                521 -> if (isDay) R.drawable.sprinkle else R.drawable.sprinkle_1
+                522 -> if (isDay) R.drawable.sprinkle else R.drawable.sprinkle_1
+                531 -> if (isDay) R.drawable.sprinkle else R.drawable.sprinkle_1
+
+                600 -> R.drawable.snowy
+                601 -> R.drawable.snowy
+                602 -> R.drawable.snowy
+                611 -> R.drawable.sleet_2
+                612 -> if (isDay) R.drawable.sleet else R.drawable.sleet_1
+                615 -> R.drawable.sleet_2
+                616 -> R.drawable.sleet_2
+                620 -> if (isDay) R.drawable.snowy_1 else R.drawable.snowy_2
+                621 -> if (isDay) R.drawable.snowy_1 else R.drawable.snowy_2
+                622 -> if (isDay) R.drawable.snowy_1 else R.drawable.snowy_2
+
+                701 -> R.drawable.haze
+                711 -> R.drawable.haze
+                721 -> R.drawable.haze
+                731 -> R.drawable.storm_2
+                741 -> R.drawable.haze
+                751 -> R.drawable.storm_2
+                761 -> R.drawable.storm_2
+                762 -> R.drawable.haze
+                771 -> R.drawable.wind
+                781 -> R.drawable.tornado
+
+                800 -> if (isDay) R.drawable.sun else R.drawable.moon
+                801 -> if (isDay) R.drawable.sunny else R.drawable.cloudy_night
+                802 -> if (isDay) R.drawable.sunny else R.drawable.cloudy_night
+                803 -> if (isDay) R.drawable.cloudy_night_2 else R.drawable.cloudy_night
+                804 -> R.drawable.cloud
+
+                900 -> R.drawable.tornado
+                901 -> R.drawable.storm_21
+                902 -> R.drawable.hurricane_1
+                903 -> if (isDay) R.drawable.sun else R.drawable.moon
+                904 -> if (isDay) R.drawable.sun else R.drawable.moon
+                905 -> R.drawable.wind
+                906 -> R.drawable.hail_2
+
+                951 -> if (isDay) R.drawable.sun else R.drawable.moon
+                952 -> if (isDay) R.drawable.wind_13 else R.drawable.wind
+                953 -> if (isDay) R.drawable.wind_13 else R.drawable.wind
+                954 -> if (isDay) R.drawable.wind_13 else R.drawable.wind
+                955 -> if (isDay) R.drawable.wind_13 else R.drawable.wind
+                956 -> R.drawable.wind
+                957 -> R.drawable.wind
+                958 -> R.drawable.wind
+                959 -> R.drawable.wind
+                960 -> R.drawable.storm_21
+                961 -> R.drawable.storm_21
+                962 -> R.drawable.hurricane_1
+                else -> R.drawable.sunny
+            }
         }
     }
 }

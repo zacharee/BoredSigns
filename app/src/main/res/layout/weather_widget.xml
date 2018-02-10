@@ -13,7 +13,7 @@
         android:layout_alignParentLeft="true"
         android:paddingLeft="12px"
         android:paddingRight="12px"
-        app:srcCompat="@drawable/ic_wb_sunny_white_24dp" />
+        app:srcCompat="@drawable/sun" />
 
     <TextView
         android:id="@+id/title"

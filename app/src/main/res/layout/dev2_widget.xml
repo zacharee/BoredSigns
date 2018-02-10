@@ -23,7 +23,6 @@
             android:textSize="50px" />
 
         <TextView
-            android:id="@+id/cpu_title"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -52,7 +51,6 @@
             android:textSize="50px" />
 
         <TextView
-            android:id="@+id/gpu_title"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -81,7 +79,6 @@
             android:textSize="50px" />
 
         <TextView
-            android:id="@+id/batt_title"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
