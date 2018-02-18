@@ -11,6 +11,7 @@ import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.util.Log
 import com.zacharee1.boredsigns.R
 
 
@@ -24,12 +25,18 @@ object Utils {
 
     fun checkCompatibility(context: Context): Boolean {
         return {
-            val pm = context.packageManager
-            val intent = pm.getLaunchIntentForPackage("com.lge.signboard")
             compatibleDevices.contains(Build.DEVICE.toLowerCase())
-                    && intent != null
-                    && pm.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY).size > 0
+                    && isPackageInstalled(context, "com.lge.signboard")
         }.invoke()
+    }
+
+    fun isPackageInstalled(context: Context, pkg: String): Boolean {
+        return try {
+            context.packageManager.getPackageInfo(pkg, 0)
+            true
+        } catch (e: Exception) {
+            false
+        }
     }
 
     fun sendWidgetUpdate(context: Context, clazz: Class<*>, extras: Bundle?) {
