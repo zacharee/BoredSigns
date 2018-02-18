@@ -38,6 +38,10 @@ import com.zacharee1.boredsigns.util.Utils
 import java.util.*
 
 class InfoWidget : AppWidgetProvider() {
+    companion object {
+        const val MAX_NOTIF_COUNT = 10
+    }
+
     private var mBatteryState: BatteryState = BatteryState(0, false)
     private var mMobileState: MobileSignalState = MobileSignalState(-1, false, "")
     private var mWiFiState: WiFiSignalState = WiFiSignalState(-1)
@@ -104,7 +108,7 @@ class InfoWidget : AppWidgetProvider() {
                         val index = it.orderedKeys.indexOf(ranking)
 
                         InfoService.NOTIFS?.let {notifs ->
-                            if (index < notifs.size) {
+                            if (index < notifs.size && index < MAX_NOTIF_COUNT) {
                                 val rankInfo: NotificationListenerService.Ranking = NotificationListenerService.Ranking()
                                 it.getRanking(ranking, rankInfo)
 

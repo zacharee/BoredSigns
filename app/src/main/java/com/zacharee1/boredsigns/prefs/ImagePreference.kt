@@ -40,7 +40,7 @@ class ImagePreference(context: Context, attributeSet: AttributeSet) : Preference
                 drawable = Drawable.createFromStream(context.contentResolver.openInputStream(uri), uri.toString())
             } catch (e: Exception) {
                 drawable = context.resources.getDrawable(R.drawable.example, null)
-                preferenceManager.sharedPreferences.edit().putString(key, null).apply()
+                preferenceManager?.sharedPreferences?.edit()?.putString(key, null)?.apply()
             }
         }
     }

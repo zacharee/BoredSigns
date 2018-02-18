@@ -181,21 +181,25 @@ class WeatherService : Service() {
                 weather.getLocationWeather(lat.toString(), lon.toString(), object : WeatherCallback() {
                     @SuppressLint("CheckResult")
                     override fun success(response: WeatherResponseModel) {
-                        val extras = Bundle()
+                        try {
+                            val extras = Bundle()
 
-                        val temp = response.main.temp
-                        val tempDouble: Double = if (useCelsius) TempUnitConverter.convertToCelsius(temp) else TempUnitConverter.convertToFahrenheit(temp)
-                        val time = SimpleDateFormat("h:mm aa", Locale.getDefault()).format(Date(response.dt.toLong() * 1000))
+                            val temp = response.main.temp
+                            val tempDouble: Double = if (useCelsius) TempUnitConverter.convertToCelsius(temp) else TempUnitConverter.convertToFahrenheit(temp)
+                            val time = SimpleDateFormat("h:mm aa", Locale.getDefault()).format(Date(response.dt.toLong() * 1000))
 
-                        val formatted = DecimalFormat("#").format(tempDouble).toString()
+                            val formatted = DecimalFormat("#").format(tempDouble).toString()
 
-                        extras.putString(EXTRA_TEMP, formatted + "°" + if (useCelsius) "C" else "F")
-                        extras.putString(EXTRA_LOC, addrs[0].locality + ", " + addrs[0].adminArea)
-                        extras.putString(EXTRA_DESC, capitalize(response.weather[0].description))
-                        extras.putString(EXTRA_TIME, time)
-                        extras.putInt(EXTRA_ICON, Utils.parseWeatherIconCode(response.weather[0].id, response.weather[0].icon))
+                            extras.putString(EXTRA_TEMP, formatted + "°" + if (useCelsius) "C" else "F")
+                            extras.putString(EXTRA_LOC, addrs[0].locality + ", " + addrs[0].adminArea)
+                            extras.putString(EXTRA_DESC, capitalize(response.weather[0].description))
+                            extras.putString(EXTRA_TIME, time)
+                            extras.putInt(EXTRA_ICON, Utils.parseWeatherIconCode(response.weather[0].id, response.weather[0].icon))
 
-                        Utils.sendWidgetUpdate(this@WeatherService, WeatherWidget::class.java, extras)
+                            Utils.sendWidgetUpdate(this@WeatherService, WeatherWidget::class.java, extras)
+                        } catch (e: Exception) {
+                            failure(e.localizedMessage)
+                        }
                     }
 
                     override fun failure(error: String?) {
@@ -288,7 +292,7 @@ class WeatherService : Service() {
         return Utils.isWidgetInUse(WeatherForecastWidget::class.java, this)
     }
 
-    class ForecastParser() {
+    class ForecastParser {
         private val numToGet = 7
         private val template = "http://api.openweathermap.org/data/2.5/forecast/daily?lat=LAT&lon=LON&cnt=$numToGet&appid=$API_KEY"
 
@@ -383,7 +387,8 @@ class WeatherService : Service() {
                 if ((e.cause != null && e.cause is UnknownHostException) || e is UnknownHostException) {
                     JSONObject("{\"cod\":001, \"message\": \"Unknown Host\"}")
                 } else {
-                    throw e
+                    e.printStackTrace()
+                    JSONObject("{\"cod\":001, \"message\": \"${e.localizedMessage}\"}")
                 }
             }
         }
