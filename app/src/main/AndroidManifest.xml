@@ -100,6 +100,8 @@
         <activity
             android:name=".activities.NavBarConfigureActivity"
             android:exported="true" />
+        <activity android:name=".activities.NotSupportedActivity"
+            android:theme="@style/AppTheme.Null" />
 
         <receiver
             android:name=".widgets.InfoWidget"
@@ -243,10 +245,9 @@
             android:name=".services.Dev2Service"
             android:enabled="true"
             android:exported="true" />
-        <service
-            android:name=".services.FirebaseService">
+        <service android:name=".services.FirebaseService">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
@@ -256,7 +257,6 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@mipmap/ic_launcher_boredsigns" />

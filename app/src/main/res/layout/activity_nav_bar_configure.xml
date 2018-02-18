@@ -45,6 +45,18 @@
 
     </ScrollView>
 
+    <TextView
+        android:id="@+id/reset_image_instruction"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/reset_image_instructions"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toTopOf="@id/control_bar_wrapper"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/buttons_order_wrapper"
+        app:layout_constraintVertical_bias="1.0" />
+
     <HorizontalScrollView
         android:id="@+id/control_bar_wrapper"
         android:layout_width="match_parent"

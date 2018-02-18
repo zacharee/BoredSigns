@@ -51,6 +51,10 @@
     <string name="accessibility_service">BoredSigns\' Accessibility Service is used for the Navigation Bar widget. It allows the back, home, recents, splitscreen, notification, power and qs buttons to function. This service is not used for anything else.</string>
     <string name="location_services_needed">Location Services must be ON to use this feature.</string>
     <string name="weather_icon_attr">Icons made by Pixel Perfect on www.flaticon.com</string>
+    <string name="not_compat_message">Your device isn\'t compatible with BoredSigns.</string>
+
+    <!--Titles-->
+    <string name="not_compat_title">Not Compatible!</string>
 
     <!--Misc-->
     <string name="select_image">Select Image</string>
@@ -60,4 +64,5 @@
     <string name="no_config_activity">No configuration found</string>
     <string name="tap_to_configure">Tap to Configure</string>
     <string name="error_launching_config">Error launching configuration</string>
+    <string name="reset_image_instructions">Long-press an image button to reset the icon.</string>
 </resources>

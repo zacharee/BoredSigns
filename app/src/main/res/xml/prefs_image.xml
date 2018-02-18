@@ -7,7 +7,8 @@
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="com.zacharee1.boredsigns"
-            android:targetClass="com.zacharee1.boredsigns.activities.ImagePickerActivity" />
+            android:targetClass="com.zacharee1.boredsigns.activities.ImagePickerActivity"
+            android:data="1"/>
     </com.zacharee1.boredsigns.prefs.ImagePreference>
 
     <Preference

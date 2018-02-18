@@ -190,8 +190,8 @@ class WeatherService : Service() {
 
                             val formatted = DecimalFormat("#").format(tempDouble).toString()
 
-                            extras.putString(EXTRA_TEMP, formatted + "°" + if (useCelsius) "C" else "F")
-                            extras.putString(EXTRA_LOC, addrs[0].locality + ", " + addrs[0].adminArea)
+                            extras.putString(EXTRA_TEMP, "${formatted}° ${if (useCelsius) "C" else "F"}")
+                            extras.putString(EXTRA_LOC, "${addrs[0].locality}, ${addrs[0].adminArea}")
                             extras.putString(EXTRA_DESC, capitalize(response.weather[0].description))
                             extras.putString(EXTRA_TIME, time)
                             extras.putInt(EXTRA_ICON, Utils.parseWeatherIconCode(response.weather[0].id, response.weather[0].icon))
@@ -223,13 +223,13 @@ class WeatherService : Service() {
                                 .map { it.main.temp_max }
                                 .map { if (useCelsius) TempUnitConverter.convertToCelsius(it) else TempUnitConverter.convertToFahrenheit(it) }
                                 .map { DecimalFormat("#").format(it).toString() }
-                                .mapTo(highTemps) { it + "°" + if (useCelsius) "C" else "F" }
+                                .mapTo(highTemps) { "$it° ${if (useCelsius) "C" else "F"}" }
 
                         model.list
                                 .map { it.main.temp_min }
                                 .map { if (useCelsius) TempUnitConverter.convertToCelsius(it) else TempUnitConverter.convertToFahrenheit(it) }
                                 .map { DecimalFormat("#").format(it).toString() }
-                                .mapTo(lowTemps) { it + "°" + if (useCelsius) "C" else "F" }
+                                .mapTo(lowTemps) { "$it° ${if (useCelsius) "C" else "F"}" }
 
                         model.list.mapTo(times) { SimpleDateFormat("M/d", Locale.getDefault()).format(Date(it.dt.toLong() * 1000)) }
 
@@ -237,7 +237,7 @@ class WeatherService : Service() {
 
                         extras.putStringArrayList(EXTRA_TEMP, highTemps)
                         extras.putStringArrayList(EXTRA_TEMP_EX, lowTemps)
-                        extras.putString(EXTRA_LOC, addrs[0].locality + ", " + addrs[0].adminArea)
+                        extras.putString(EXTRA_LOC, "${addrs[0].locality}, ${addrs[0].adminArea}")
                         extras.putStringArrayList(EXTRA_TIME, times)
                         extras.putIntegerArrayList(EXTRA_ICON, icons)
 

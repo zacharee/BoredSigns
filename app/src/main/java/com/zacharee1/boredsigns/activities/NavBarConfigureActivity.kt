@@ -2,7 +2,10 @@ package com.zacharee1.boredsigns.activities
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
+import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -27,7 +30,9 @@ import android.widget.Button
 import android.widget.TextView
 import com.jmedeisis.draglinearlayout.DragLinearLayout
 import com.zacharee1.boredsigns.util.Utils
+import com.zacharee1.boredsigns.views.NavBarButton
 import com.zacharee1.boredsigns.views.NavBarDragItemView
+import kotlinx.android.synthetic.main.aod_item.view.*
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -56,13 +61,13 @@ class NavBarConfigureActivity : AppCompatActivity() {
                 saveNewOrder(new)
                 sendUpdate(new)
             }
-            view.findViewById<TextView>(R.id.text).text = button.getName()
-            view.key = button.getKey()
+            view.findViewById<TextView>(R.id.text).text = button.name
+            view.key = button.key
 
             if (!addIfNotContains(view)) buttonArray.add(view)
         }
 
-        buttonOrderer.setOnViewSwapListener { firstView, firstPosition, secondView, secondPosition ->
+        buttonOrderer.setOnViewSwapListener { _, firstPosition, _, secondPosition ->
             Collections.swap(buttonArray, firstPosition, secondPosition)
 
             val new = getKeyOrder(buttonArray)
@@ -94,8 +99,8 @@ class NavBarConfigureActivity : AppCompatActivity() {
                 saveNewOrder(new)
                 sendUpdate(new)
             }
-            view.findViewById<TextView>(R.id.text).text = button.getName()
-            view.key = button.getKey()
+            view.findViewById<TextView>(R.id.text).text = button.name
+            view.key = button.key
 
             if (!addIfNotContains(view)) buttonArray.add(view)
 
@@ -106,17 +111,10 @@ class NavBarConfigureActivity : AppCompatActivity() {
 
         val control = findViewById<LinearLayout>(R.id.control_bar)
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-            control.findViewById<ImageView>(R.id.split).visibility = View.GONE
-        }
-
-        for (i in 0 until control.childCount) {
-            val view = control.getChildAt(i)
-
-            if (view is ImageView) {
-                view.setOnClickListener(listener)
-            }
-        }
+        (0 until control.childCount)
+                .map { control.getChildAt(it) }
+                .filterIsInstance<ImageView>()
+                .forEach { it.setOnClickListener(listener) }
     }
 
     private fun addIfNotContains(view: NavBarDragItemView): Boolean {
@@ -126,6 +124,20 @@ class NavBarConfigureActivity : AppCompatActivity() {
 
             if (v is NavBarDragItemView) {
                 if (v.key == view.key) return true
+            }
+        }
+
+        view.findViewById<ImageView>(R.id.choose_image)?.let{
+            it.setOnClickListener {
+                val intent = Intent(this, ImagePickerActivity::class.java)
+                intent.data = Uri.parse("2")
+                intent.putExtra("key", view.key)
+                startActivity(intent)
+            }
+            it.setOnLongClickListener {
+                PreferenceManager.getDefaultSharedPreferences(this).edit().putString(view.key, null).apply()
+                Utils.sendWidgetUpdate(this, NavBarWidget::class.java, null)
+                true
             }
         }
 
@@ -162,53 +174,6 @@ class NavBarConfigureActivity : AppCompatActivity() {
         order.forEach {
             val view = NavBarButton(this, it)
             navBar.addView(view)
-        }
-    }
-
-    @SuppressLint("ViewConstructor")
-    class NavBarButton(context: Context, private var key: String?) : LinearLayout(context) {
-        private var layoutId = 0
-
-        init {
-            layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT)
-            (layoutParams as LinearLayout.LayoutParams).weight = 1F
-
-            setLayoutIdAndInflate()
-        }
-
-        private fun setLayoutIdAndInflate() {
-            when (key) {
-                "home" -> layoutId = R.layout.navbar_home
-                "recents" -> layoutId = R.layout.navbar_recents
-                "back" -> layoutId = R.layout.navbar_back
-                "power" -> layoutId = R.layout.navbar_power
-                "qs" -> layoutId = R.layout.navbar_qs
-                "split" -> layoutId = R.layout.navbar_splitscreen
-                "notif" -> layoutId = R.layout.navbar_notifs
-            }
-
-            if (layoutId == 0) return
-
-            inflate(context, layoutId, this)
-        }
-
-        fun getKey(): String? {
-            return key
-        }
-
-        fun getName(): String {
-            var which = 0
-            when (key) {
-                "home" -> which = R.string.home
-                "recents" -> which = R.string.recents
-                "back" -> which = R.string.back
-                "power" -> which = R.string.power
-                "qs" -> which = R.string.qs
-                "split" -> which = R.string.splitscreen
-                "notif" -> which = R.string.notifications
-            }
-
-            return if (which != 0) context.resources.getString(which) else ""
         }
     }
 }

@@ -7,6 +7,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.preference.PreferenceManager
 import android.provider.Settings
@@ -17,6 +18,7 @@ import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.activities.PermissionsActivity
 import com.zacharee1.boredsigns.services.NavBarAccessibility
 import com.zacharee1.boredsigns.util.Utils
+import com.zacharee1.boredsigns.views.NavBarButton
 
 class NavBarWidget : AppWidgetProvider() {
     companion object {
@@ -46,60 +48,15 @@ class NavBarWidget : AppWidgetProvider() {
         views.removeAllViews(R.id.nav_bar)
 
         for (button in buttonsList) {
-            var action = ""
-            var layout = 0
-            var id = 0
+            val navButton = NavBarButton(context, button)
 
-            when (button) {
-                "home" -> {
-                    action = NavBarAccessibility.HOME
-                    layout = R.layout.navbar_home
-                    id = R.id.home
-                }
-
-                "recents" -> {
-                    action = NavBarAccessibility.RECENTS
-                    layout = R.layout.navbar_recents
-                    id = R.id.recents
-                }
-
-                "back" -> {
-                    action = NavBarAccessibility.BACK
-                    layout = R.layout.navbar_back
-                    id = R.id.back
-                }
-
-                "split" -> {
-                    action = NavBarAccessibility.SPLIT
-                    layout = R.layout.navbar_splitscreen
-                    id = R.id.split
-                }
-
-                "qs" -> {
-                    action = NavBarAccessibility.QS
-                    layout = R.layout.navbar_qs
-                    id = R.id.qs
-                }
-
-                "notif" -> {
-                    action = NavBarAccessibility.NOTIFS
-                    layout = R.layout.navbar_notifs
-                    id = R.id.notifs
-                }
-
-                "power" -> {
-                    action = NavBarAccessibility.POWER
-                    layout = R.layout.navbar_power
-                    id = R.id.power
-                }
-            }
-
-            val new = RemoteViews(context.packageName, layout)
+            val new = RemoteViews(context.packageName, navButton.layoutId)
+            new.setImageViewBitmap(R.id.image, Utils.drawableToBitmap(navButton.icon.invoke()))
             new.setInt(R.id.image, "setColorFilter", prefs.getInt("nav_button_color", Color.WHITE))
+            val pendingIntent = PendingIntent.getBroadcast(context, 0, Intent(navButton.action), 0)
+            new.setOnClickPendingIntent(R.id.button, pendingIntent)
 
-            views.addView(R.id.nav_bar, new )
-            val pendingIntent = PendingIntent.getBroadcast(context, 0, Intent(action), 0)
-            views.setOnClickPendingIntent(id, pendingIntent)
+            views.addView(R.id.nav_bar, new)
         }
 
         appWidgetManager.updateAppWidget(appWidgetIds, views)

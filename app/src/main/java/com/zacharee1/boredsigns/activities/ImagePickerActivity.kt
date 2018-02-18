@@ -13,10 +13,12 @@ import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.services.InfoService
 import com.zacharee1.boredsigns.util.Utils
 import com.zacharee1.boredsigns.widgets.ImageWidget
+import com.zacharee1.boredsigns.widgets.NavBarWidget
 
 class ImagePickerActivity : AppCompatActivity() {
     companion object {
         const val SELECT_PICTURE = 1
+        const val SELECT_NAV_ICON = 2
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,7 +28,7 @@ class ImagePickerActivity : AppCompatActivity() {
         val intent = Intent()
         intent.type = "image/*"
         intent.action = Intent.ACTION_GET_CONTENT
-        startActivityForResult(Intent.createChooser(intent, resources.getText(R.string.select_image)), SELECT_PICTURE)
+        startActivityForResult(Intent.createChooser(intent, resources.getText(R.string.select_image)), ImagePickerActivity@this.intent.data.toString().toInt())
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -48,6 +50,13 @@ class ImagePickerActivity : AppCompatActivity() {
             } else {
                 finish()
             }
+        } else if (requestCode == SELECT_NAV_ICON) {
+            val uri = data?.data
+            uri?.let {
+                PreferenceManager.getDefaultSharedPreferences(this).edit().putString(intent.getStringExtra("key"), uri.toString()).apply()
+                Utils.sendWidgetUpdate(this, NavBarWidget::class.java, null)
+            }
+            finish()
         }
     }
 }
