@@ -37,7 +37,7 @@ class ImageWidget : AppWidgetProvider() {
                 val options = BitmapFactory.Options()
                 options.outHeight = 160
                 options.outWidth = 1040
-                val bitmap = BitmapFactory.decodeStream(stream, null, options)
+                val bitmap = Utils.getResizedBitmap(BitmapFactory.decodeStream(stream, null, options), options.outWidth, options.outHeight)
 
                 views.setImageViewBitmap(R.id.main, bitmap)
             } catch (e: Exception) {

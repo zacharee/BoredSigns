@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Matrix
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
@@ -24,10 +25,8 @@ object Utils {
     )
 
     fun checkCompatibility(context: Context): Boolean {
-        return {
-            compatibleDevices.contains(Build.DEVICE.toLowerCase())
-                    && isPackageInstalled(context, "com.lge.signboard")
-        }.invoke()
+        return compatibleDevices.contains(Build.DEVICE.toLowerCase())
+                && isPackageInstalled(context, "com.lge.signboard")
     }
 
     fun isPackageInstalled(context: Context, pkg: String): Boolean {
@@ -70,6 +69,23 @@ object Utils {
         drawable.draw(canvas)
 
         return bitmap
+    }
+
+    fun getResizedBitmap(bm: Bitmap, newWidth: Int, newHeight: Int): Bitmap {
+        val width = bm.width
+        val height = bm.height
+        val scaleWidth = newWidth.toFloat() / width
+        val scaleHeight = newHeight.toFloat() / height
+        // CREATE A MATRIX FOR THE MANIPULATION
+        val matrix = Matrix()
+        // RESIZE THE BIT MAP
+        matrix.postScale(scaleWidth, scaleHeight)
+
+        // "RECREATE" THE NEW BITMAP
+        val resizedBitmap = Bitmap.createBitmap(
+                bm, 0, 0, width, height, matrix, false)
+        bm.recycle()
+        return resizedBitmap
     }
 
     fun trimBitmap(bmp: Bitmap?): Bitmap? {

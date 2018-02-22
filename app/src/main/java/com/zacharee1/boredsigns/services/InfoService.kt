@@ -162,7 +162,7 @@ class InfoService : NotificationListenerService() {
     }
 
     private fun sendUpdateBroadcast(extras: Bundle?) {
-        val update = Bundle(extras ?: Bundle())
+        val update = extras ?: Bundle()
 
         if (mConnected) {
             RANKING = currentRanking
