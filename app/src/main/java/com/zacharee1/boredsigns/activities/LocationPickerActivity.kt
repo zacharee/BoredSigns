@@ -7,7 +7,9 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v4.content.LocalBroadcastManager
+import android.widget.Toast
 import com.google.android.gms.location.places.ui.PlacePicker
+import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.services.WeatherService
 import com.zacharee1.boredsigns.util.Utils
 import com.zacharee1.boredsigns.widgets.WeatherForecastWidget
@@ -15,13 +17,18 @@ import com.zacharee1.boredsigns.widgets.WeatherWidget
 
 class LocationPickerActivity : AppCompatActivity() {
     companion object {
-        val REQUEST_CODE = 102
+        const val REQUEST_CODE = 102
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        startActivityForResult(PlacePicker.IntentBuilder().build(this), REQUEST_CODE)
+        try {
+            startActivityForResult(PlacePicker.IntentBuilder().build(this), REQUEST_CODE)
+        } catch (e: Exception) {
+            Toast.makeText(this, resources.getText(R.string.play_services_not_available), Toast.LENGTH_SHORT).show()
+            finish()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

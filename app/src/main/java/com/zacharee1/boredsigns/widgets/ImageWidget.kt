@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.preference.PreferenceManager
@@ -31,13 +32,12 @@ class ImageWidget : AppWidgetProvider() {
         val uriString = prefs.getString("image_picker", null)
         val views = RemoteViews(context.packageName, R.layout.image_widget)
 
+        var bitmap: Bitmap? = null
+
         if (uriString != null) {
             try {
                 val stream = context.contentResolver.openInputStream(Uri.parse(uriString))
-                val options = BitmapFactory.Options()
-                options.outHeight = 160
-                options.outWidth = 1040
-                val bitmap = Utils.getResizedBitmap(BitmapFactory.decodeStream(stream, null, options), options.outWidth, options.outHeight)
+                bitmap = Utils.getResizedBitmap(BitmapFactory.decodeStream(stream, null, null), 1040, 160)
 
                 views.setImageViewBitmap(R.id.main, bitmap)
             } catch (e: Exception) {
@@ -49,6 +49,7 @@ class ImageWidget : AppWidgetProvider() {
         }
 
         appWidgetManager.updateAppWidget(appWidgetIds, views)
+        bitmap?.recycle()
     }
 }
 

@@ -37,12 +37,12 @@ class PermissionsActivity : AppCompatActivity() {
         )
     }
 
-    private lateinit var klass: Class<*>
+    private var klass: Class<*>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        klass = intent.extras["class"] as Class<*>
+        klass = intent.extras?.get("class") as Class<*>?
 
         requestPermissions(REQUEST, 101)
     }
@@ -54,7 +54,7 @@ class PermissionsActivity : AppCompatActivity() {
         finish()
     }
 
-    fun updateAll() {
+    private fun updateAll() {
         val man = AppWidgetManager.getInstance(this)
         val ids = man.getAppWidgetIds(ComponentName(this, klass))
         val updateIntent = Intent()

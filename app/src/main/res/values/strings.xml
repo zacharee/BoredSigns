@@ -52,6 +52,7 @@
     <string name="location_services_needed">Location Services must be ON to use this feature.</string>
     <string name="weather_icon_attr">Icons made by Pixel Perfect on www.flaticon.com</string>
     <string name="not_compat_message">Your device isn\'t compatible with BoredSigns.</string>
+    <string name="play_services_not_available">Play Services unavailable.</string>
 
     <!--Titles-->
     <string name="not_compat_title">Not Compatible!</string>

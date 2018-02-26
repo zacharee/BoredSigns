@@ -4,15 +4,14 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Matrix
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
-import android.util.Log
 import com.zacharee1.boredsigns.R
 
 
@@ -82,10 +81,8 @@ object Utils {
         matrix.postScale(scaleWidth, scaleHeight)
 
         // "RECREATE" THE NEW BITMAP
-        val resizedBitmap = Bitmap.createBitmap(
+        return Bitmap.createBitmap(
                 bm, 0, 0, width, height, matrix, false)
-        bm.recycle()
-        return resizedBitmap
     }
 
     fun trimBitmap(bmp: Bitmap?): Bitmap? {
