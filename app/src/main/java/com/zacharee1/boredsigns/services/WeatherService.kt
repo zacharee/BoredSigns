@@ -99,7 +99,6 @@ class WeatherService : Service() {
     override fun onCreate() {
         super.onCreate()
         prefs = PreferenceManager.getDefaultSharedPreferences(this)
-        locClient = LocationServices.getFusedLocationProviderClient(this)
         alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         val intent = Intent(this, this::class.java)
@@ -159,6 +158,7 @@ class WeatherService : Service() {
                     val lon = prefs.getFloat("weather_lon", -0.076132F).toDouble()
                     getWeather(lat, lon)
                 } else if (checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    locClient = LocationServices.getFusedLocationProviderClient(this)
                     locClient.lastLocation.addOnCompleteListener {
                         it.result?.let {
                             val lat = it.latitude
