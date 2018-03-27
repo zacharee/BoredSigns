@@ -111,6 +111,8 @@ class WeatherService : Service() {
                 alarmIntent)
 
         if (checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            locClient = LocationServices.getFusedLocationProviderClient(this)
+
             val locMan = getSystemService(Context.LOCATION_SERVICE) as LocationManager
             val provider = when {
                 locMan.isProviderEnabled(LocationManager.NETWORK_PROVIDER) -> LocationManager.NETWORK_PROVIDER
@@ -158,7 +160,6 @@ class WeatherService : Service() {
                     val lon = prefs.getFloat("weather_lon", -0.076132F).toDouble()
                     getWeather(lat, lon)
                 } else if (checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    locClient = LocationServices.getFusedLocationProviderClient(this)
                     locClient.lastLocation.addOnCompleteListener {
                         it.result?.let {
                             val lat = it.latitude

@@ -48,12 +48,12 @@ class NavBarButton(context: Context, var key: String?) : LinearLayout(context) {
                 else -> R.drawable.ic_help_outline_black_24dp
             }
 
-            context.resources.getDrawable(which, null)
+            context.resources.getDrawable(which, null)!!
         } else {
             try {
-                Drawable.createFromStream(context.contentResolver.openInputStream(Uri.parse(prefUri)), prefUri)
+                Drawable.createFromStream(context.contentResolver.openInputStream(Uri.parse(prefUri)), prefUri) ?: throw Exception()
             } catch (e: Exception) {
-                context.resources.getDrawable(R.drawable.ic_help_outline_black_24dp, null)
+                context.resources.getDrawable(R.drawable.ic_help_outline_black_24dp, null)!!
             }
         }
     }
