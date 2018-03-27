@@ -80,13 +80,14 @@ class NavBarConfigureActivity : AppCompatActivity() {
         val listener = View.OnClickListener {
             var keyToAdd = ""
             when (it.id) {
-                R.id.back -> keyToAdd = "back"
-                R.id.home -> keyToAdd = "home"
-                R.id.recents -> keyToAdd = "recents"
-                R.id.split -> keyToAdd = "split"
-                R.id.power -> keyToAdd = "power"
-                R.id.qs -> keyToAdd = "qs"
-                R.id.notifs -> keyToAdd = "notif"
+                R.id.back -> keyToAdd = NavBarButton.BACK
+                R.id.home -> keyToAdd = NavBarButton.HOME
+                R.id.recents -> keyToAdd = NavBarButton.RECENTS
+                R.id.split -> keyToAdd = NavBarButton.SPLIT
+                R.id.power -> keyToAdd = NavBarButton.POWER
+                R.id.qs -> keyToAdd = NavBarButton.QS
+                R.id.notifs -> keyToAdd = NavBarButton.NOTIF
+                R.id.assist -> keyToAdd = NavBarButton.ASSIST
             }
 
             val button = NavBarButton(this, keyToAdd)

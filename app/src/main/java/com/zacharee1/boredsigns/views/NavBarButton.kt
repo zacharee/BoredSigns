@@ -19,32 +19,45 @@ import com.zacharee1.boredsigns.util.Utils
 
 @SuppressLint("ViewConstructor")
 class NavBarButton(context: Context, var key: String?) : LinearLayout(context) {
+    companion object {
+        const val HOME = "home"
+        const val RECENTS = "recents"
+        const val BACK = "back"
+        const val POWER = "power"
+        const val QS = "qs"
+        const val SPLIT = "split"
+        const val NOTIF = "notif"
+        const val ASSIST = "assist"
+    }
+
     val layoutId = R.layout.navbar_image
     var name: String = {
         val which = when (key) {
-            "home" -> R.string.home
-            "recents" -> R.string.recents
-            "back" -> R.string.back
-            "power" -> R.string.power
-            "qs" -> R.string.qs
-            "split" -> R.string.splitscreen
-            "notif" -> R.string.notifications
+            HOME -> R.string.home
+            RECENTS -> R.string.recents
+            BACK -> R.string.back
+            POWER -> R.string.power
+            QS -> R.string.qs
+            SPLIT -> R.string.splitscreen
+            NOTIF -> R.string.notifications
+            ASSIST -> R.string.assist
             else -> 0
         }
 
         if (which != 0) context.resources.getString(which) else ""
     }.invoke()
-    var icon = {
+    val icon = {
         val prefUri = PreferenceManager.getDefaultSharedPreferences(context).getString(key, null)
         if (prefUri == null) {
             val which = when (key) {
-                "home" -> R.drawable.ic_radio_button_checked_black_24dp
-                "recents" -> R.drawable.ic_crop_square_black_24dp
-                "back" -> R.drawable.ic_arrow_back_black_24dp
-                "power" -> R.drawable.ic_power_settings_new_black_24dp
-                "qs" -> R.drawable.toggle_off
-                "split" -> R.drawable.split_screen
-                "notif" -> R.drawable.ic_notifications_none_black_24dp
+                HOME -> R.drawable.ic_radio_button_checked_black_24dp
+                RECENTS -> R.drawable.ic_crop_square_black_24dp
+                BACK -> R.drawable.ic_arrow_back_black_24dp
+                POWER -> R.drawable.ic_power_settings_new_black_24dp
+                QS -> R.drawable.toggle_off
+                SPLIT -> R.drawable.split_screen
+                NOTIF -> R.drawable.ic_notifications_none_black_24dp
+                ASSIST -> R.drawable.ic_assistant_black_24dp
                 else -> R.drawable.ic_help_outline_black_24dp
             }
 
@@ -57,15 +70,16 @@ class NavBarButton(context: Context, var key: String?) : LinearLayout(context) {
             }
         }
     }
-    var action: String = {
+    val action: String = {
         when (key) {
-            "home" -> NavBarAccessibility.HOME
-            "recents" -> NavBarAccessibility.RECENTS
-            "back" -> NavBarAccessibility.BACK
-            "power" -> NavBarAccessibility.POWER
-            "qs" -> NavBarAccessibility.QS
-            "split" -> NavBarAccessibility.SPLIT
-            "notif" -> NavBarAccessibility.NOTIFS
+            HOME -> NavBarAccessibility.HOME
+            RECENTS -> NavBarAccessibility.RECENTS
+            BACK -> NavBarAccessibility.BACK
+            POWER -> NavBarAccessibility.POWER
+            QS -> NavBarAccessibility.QS
+            SPLIT -> NavBarAccessibility.SPLIT
+            NOTIF -> NavBarAccessibility.NOTIFS
+            ASSIST -> NavBarAccessibility.ASSIST
             else -> ""
         }
     }.invoke()
@@ -94,13 +108,14 @@ class NavBarButton(context: Context, var key: String?) : LinearLayout(context) {
         setIcon()
 
         id = when(key) {
-            "home" -> R.id.home
-            "recents" -> R.id.recents
-            "back" -> R.id.back
-            "power" -> R.id.power
-            "qs" -> R.id.qs
-            "split" -> R.id.split
-            "notif" -> R.id.notifs
+            HOME -> R.id.home
+            RECENTS -> R.id.recents
+            BACK -> R.id.back
+            POWER -> R.id.power
+            QS -> R.id.qs
+            SPLIT -> R.id.split
+            NOTIF -> R.id.notifs
+            ASSIST -> R.id.assist
             else -> 0
         }
     }

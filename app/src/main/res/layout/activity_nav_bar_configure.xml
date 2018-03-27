@@ -163,6 +163,18 @@
                 android:src="@drawable/ic_notifications_none_black_24dp"
                 android:tint="#fff" />
 
+            <ImageView
+                android:id="@+id/assist"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/navbar_ripple"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="10dp"
+                android:src="@drawable/ic_assistant_black_24dp"
+                android:tint="#fff" />
+
         </LinearLayout>
 
     </HorizontalScrollView>

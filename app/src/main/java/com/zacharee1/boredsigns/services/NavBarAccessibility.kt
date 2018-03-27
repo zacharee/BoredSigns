@@ -22,6 +22,7 @@ class NavBarAccessibility : AccessibilityService() {
         const val SPLIT = BASE + "SPLIT"
         const val QS = BASE + "QS"
         const val POWER = BASE + "POWER"
+        const val ASSIST = BASE + "ASSIST"
     }
 
     private val receiver = object : BroadcastReceiver() {
@@ -52,6 +53,13 @@ class NavBarAccessibility : AccessibilityService() {
                 }
 
                 POWER -> performGlobalAction(GLOBAL_ACTION_POWER_DIALOG)
+
+                ASSIST -> {
+                    val intent = Intent(Intent.ACTION_VOICE_ASSIST)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+
+                    startActivity(intent)
+                }
             }
         }
     }
@@ -69,6 +77,7 @@ class NavBarAccessibility : AccessibilityService() {
         filter.addAction(SPLIT)
         filter.addAction(QS)
         filter.addAction(POWER)
+        filter.addAction(ASSIST)
 
         registerReceiver(receiver, filter)
 
