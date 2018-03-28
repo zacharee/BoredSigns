@@ -28,38 +28,32 @@ class NavBarButton(context: Context, var key: String?) : LinearLayout(context) {
         const val SPLIT = "split"
         const val NOTIF = "notif"
         const val ASSIST = "assist"
+
+        val INFOS = object : HashMap<String, Info>() {
+            init {
+                put(HOME, Info(R.string.home, R.id.home, R.drawable.ic_radio_button_checked_black_24dp, HOME, NavBarAccessibility.HOME))
+                put(RECENTS, Info(R.string.recents, R.id.recents, R.drawable.ic_crop_square_black_24dp, RECENTS, NavBarAccessibility.RECENTS))
+                put(BACK, Info(R.string.back, R.id.back, R.drawable.ic_arrow_back_black_24dp, BACK, NavBarAccessibility.BACK))
+                put(POWER, Info(R.string.power, R.id.power, R.drawable.ic_power_settings_new_black_24dp, POWER, NavBarAccessibility.POWER))
+                put(QS, Info(R.string.qs, R.id.qs, R.drawable.toggle_off, QS, NavBarAccessibility.QS))
+                put(SPLIT, Info(R.string.splitscreen, R.id.split, R.drawable.split_screen, SPLIT, NavBarAccessibility.SPLIT))
+                put(NOTIF, Info(R.string.notifications, R.id.notifs, R.drawable.ic_notifications_none_black_24dp, NOTIF, NavBarAccessibility.NOTIFS))
+                put(ASSIST, Info(R.string.assist, R.id.assist, R.drawable.ic_assistant_black_24dp, ASSIST, NavBarAccessibility.ASSIST))
+            }
+        }
     }
 
-    val layoutId = R.layout.navbar_image
-    var name: String = {
-        val which = when (key) {
-            HOME -> R.string.home
-            RECENTS -> R.string.recents
-            BACK -> R.string.back
-            POWER -> R.string.power
-            QS -> R.string.qs
-            SPLIT -> R.string.splitscreen
-            NOTIF -> R.string.notifications
-            ASSIST -> R.string.assist
-            else -> 0
-        }
+    val info = INFOS[key]
 
-        if (which != 0) context.resources.getString(which) else ""
+    var name: String = {
+        val which = info?.name
+        if (which != null && which != 0) context.resources.getString(which) else ""
     }.invoke()
+
     val icon = {
         val prefUri = PreferenceManager.getDefaultSharedPreferences(context).getString(key, null)
         if (prefUri == null) {
-            val which = when (key) {
-                HOME -> R.drawable.ic_radio_button_checked_black_24dp
-                RECENTS -> R.drawable.ic_crop_square_black_24dp
-                BACK -> R.drawable.ic_arrow_back_black_24dp
-                POWER -> R.drawable.ic_power_settings_new_black_24dp
-                QS -> R.drawable.toggle_off
-                SPLIT -> R.drawable.split_screen
-                NOTIF -> R.drawable.ic_notifications_none_black_24dp
-                ASSIST -> R.drawable.ic_assistant_black_24dp
-                else -> R.drawable.ic_help_outline_black_24dp
-            }
+            val which = info?.icon ?: R.drawable.ic_help_outline_black_24dp
 
             context.resources.getDrawable(which, null)!!
         } else {
@@ -70,18 +64,9 @@ class NavBarButton(context: Context, var key: String?) : LinearLayout(context) {
             }
         }
     }
+
     val action: String = {
-        when (key) {
-            HOME -> NavBarAccessibility.HOME
-            RECENTS -> NavBarAccessibility.RECENTS
-            BACK -> NavBarAccessibility.BACK
-            POWER -> NavBarAccessibility.POWER
-            QS -> NavBarAccessibility.QS
-            SPLIT -> NavBarAccessibility.SPLIT
-            NOTIF -> NavBarAccessibility.NOTIFS
-            ASSIST -> NavBarAccessibility.ASSIST
-            else -> ""
-        }
+        info?.action ?: ""
     }.invoke()
 
     private val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
@@ -104,20 +89,10 @@ class NavBarButton(context: Context, var key: String?) : LinearLayout(context) {
     }
 
     private fun setLayoutIdAndInflate() {
-        inflate(context, layoutId, this)
-        setIcon()
+        id = info?.id ?: 0
 
-        id = when(key) {
-            HOME -> R.id.home
-            RECENTS -> R.id.recents
-            BACK -> R.id.back
-            POWER -> R.id.power
-            QS -> R.id.qs
-            SPLIT -> R.id.split
-            NOTIF -> R.id.notifs
-            ASSIST -> R.id.assist
-            else -> 0
-        }
+        inflate(context, R.layout.navbar_image, this)
+        setIcon()
     }
 
     private fun setIcon() {
@@ -126,4 +101,6 @@ class NavBarButton(context: Context, var key: String?) : LinearLayout(context) {
             it.setColorFilter(PreferenceManager.getDefaultSharedPreferences(context).getInt("nav_button_color", Color.WHITE))
         }
     }
+
+    class Info(val name: Int, val id: Int, val icon: Int, val key: String, val action: String)
 }
