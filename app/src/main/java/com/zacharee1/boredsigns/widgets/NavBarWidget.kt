@@ -51,9 +51,9 @@ class NavBarWidget : AppWidgetProvider() {
             val navButton = NavBarButton(context, button)
 
             val new = RemoteViews(context.packageName, navButton.layoutId)
-            new.setImageViewBitmap(R.id.image, Utils.getResizedBitmap(Utils.drawableToBitmap(navButton.icon.invoke()), 100, 100))
+            new.setImageViewBitmap(R.id.image, Utils.getResizedBitmap(Utils.drawableToBitmap(navButton.icon), 100, 100))
             new.setInt(R.id.image, "setColorFilter", prefs.getInt("nav_button_color", Color.WHITE))
-            val pendingIntent = PendingIntent.getBroadcast(context, 0, Intent(navButton.action), 0)
+            val pendingIntent = PendingIntent.getBroadcast(context, 0, Intent(navButton.info?.action ?: ""), 0)
             new.setOnClickPendingIntent(R.id.button, pendingIntent)
 
             views.addView(R.id.nav_bar, new)

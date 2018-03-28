@@ -45,29 +45,23 @@ class NavBarButton(context: Context, var key: String?) : LinearLayout(context) {
 
     val info = INFOS[key]
 
-    var name: String = {
-        val which = info?.name
-        if (which != null && which != 0) context.resources.getString(which) else ""
-    }.invoke()
+    val layoutId = R.layout.navbar_image
 
-    val icon = {
-        val prefUri = PreferenceManager.getDefaultSharedPreferences(context).getString(key, null)
-        if (prefUri == null) {
-            val which = info?.icon ?: R.drawable.ic_help_outline_black_24dp
+    val name: String
+        get() {
+            val which = info?.name ?: 0
+            return if (which != 0) context.resources.getString(which) else ""
+        }
 
-            context.resources.getDrawable(which, null)!!
-        } else {
-            try {
-                Drawable.createFromStream(context.contentResolver.openInputStream(Uri.parse(prefUri)), prefUri) ?: throw Exception()
-            } catch (e: Exception) {
-                context.resources.getDrawable(R.drawable.ic_help_outline_black_24dp, null)!!
+    val icon: Drawable
+        get() {
+            val prefUri = PreferenceManager.getDefaultSharedPreferences(context).getString(key, null)
+            return try {
+                Drawable.createFromStream(context.contentResolver.openInputStream(Uri.parse(prefUri)), prefUri) ?: throw NullPointerException()
+            } catch (e: NullPointerException) {
+                context.resources.getDrawable(R.drawable.ic_help_outline_black_24dp, null)
             }
         }
-    }
-
-    val action: String = {
-        info?.action ?: ""
-    }.invoke()
 
     private val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
         if (key == this.key) {
@@ -91,13 +85,13 @@ class NavBarButton(context: Context, var key: String?) : LinearLayout(context) {
     private fun setLayoutIdAndInflate() {
         id = info?.id ?: 0
 
-        inflate(context, R.layout.navbar_image, this)
+        inflate(context, layoutId, this)
         setIcon()
     }
 
     private fun setIcon() {
         findViewById<ImageView>(R.id.image)?.let {
-            it.setImageBitmap(Utils.drawableToBitmap(icon.invoke()))
+            it.setImageBitmap(Utils.drawableToBitmap(icon))
             it.setColorFilter(PreferenceManager.getDefaultSharedPreferences(context).getInt("nav_button_color", Color.WHITE))
         }
     }
