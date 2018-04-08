@@ -72,7 +72,7 @@ class WeatherService : Service() {
 
     private lateinit var alarmIntent: PendingIntent
 
-    private val locReq: LocationRequest = LocationRequest().setSmallestDisplacement(300F)
+    private val locReq: LocationRequest = LocationRequest.create().setSmallestDisplacement(300F)
     private val locCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(p0: LocationResult) {
             for (location in p0.locations) {
@@ -195,7 +195,7 @@ class WeatherService : Service() {
                             extras.putString(EXTRA_LOC, "${addrs[0].locality}, ${addrs[0].adminArea}")
                             extras.putString(EXTRA_DESC, capitalize(response.weather[0].description))
                             extras.putString(EXTRA_TIME, time)
-                            extras.putInt(EXTRA_ICON, Utils.parseWeatherIconCode(response.weather[0].id, response.weather[0].icon))
+                            extras.putString(EXTRA_ICON, Utils.parseWeatherIconCode(response.weather[0].id, response.weather[0].icon))
 
                             Utils.sendWidgetUpdate(this@WeatherService, WeatherWidget::class.java, extras)
                         } catch (e: Exception) {
@@ -218,7 +218,7 @@ class WeatherService : Service() {
                         val highTemps = ArrayList<String>()
                         val lowTemps = ArrayList<String>()
                         val times = ArrayList<String>()
-                        val icons = ArrayList<Int>()
+                        val icons = ArrayList<String>()
 
                         model.list
                                 .map { it.main.temp_max }
@@ -240,7 +240,7 @@ class WeatherService : Service() {
                         extras.putStringArrayList(EXTRA_TEMP_EX, lowTemps)
                         extras.putString(EXTRA_LOC, "${addrs[0].locality}, ${addrs[0].adminArea}")
                         extras.putStringArrayList(EXTRA_TIME, times)
-                        extras.putIntegerArrayList(EXTRA_ICON, icons)
+                        extras.putStringArrayList(EXTRA_ICON, icons)
 
                         Utils.sendWidgetUpdate(this@WeatherService, WeatherForecastWidget::class.java, extras)
                     }

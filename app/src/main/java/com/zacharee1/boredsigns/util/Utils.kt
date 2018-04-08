@@ -4,15 +4,19 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.graphics.*
 import android.os.Bundle
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.Matrix
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.text.Html
+import android.util.TypedValue
+import android.view.Gravity
+import android.view.View
+import android.widget.TextView
+import com.android.internal.R.attr.typeface
 import com.zacharee1.boredsigns.R
+import java.util.*
 
 
 object Utils {
@@ -115,90 +119,106 @@ object Utils {
         } else null
     }
 
-    fun parseWeatherIconCode(id: String, code: String): Int {
+    fun parseWeatherIconCode(id: String, code: String): String {
         val isDay = code.contains("d")
         return when (id.toInt()) {
-            200 -> R.drawable.storm_5
-            201 -> R.drawable.storm_5
-            202 -> R.drawable.storm_5
-            210 -> R.drawable.storm_1
-            211 -> R.drawable.storm_1
-            212 -> R.drawable.storm_21
-            221 -> if (isDay) R.drawable.storm else R.drawable.storm_12
-            230 -> R.drawable.storm_5
-            231 -> R.drawable.storm_5
-            232 -> R.drawable.storm_5
+            200 -> "f01e"
+            201 -> "f01e"
+            202 -> "f01e"
+            210 -> "f01e"
+            211 -> "f01e"
+            212 -> "f01e"
+            221 -> "f01e"
+            230 -> "f01e"
+            231 -> "f01e"
+            232 -> "f01e"
 
-            300 -> R.drawable.sprinkle_2
-            301 -> R.drawable.sprinkle_2
-            302 -> R.drawable.sprinkle_2
-            310 -> R.drawable.sprinkle_2
-            311 -> R.drawable.sprinkle_2
-            312 -> R.drawable.sprinkle_2
-            313 -> R.drawable.sprinkle_2
-            314 -> if (isDay) R.drawable.sprinkle else R.drawable.sprinkle_1
-            321 -> if (isDay) R.drawable.sprinkle else R.drawable.sprinkle_1
+            300 -> "f01c"
+            301 -> "f01c"
+            302 -> "f01c"
+            310 -> "f01a"
+            311 -> "f01a"
+            312 -> "f01a"
+            313 -> "f01a"
+            314 -> "f01a"
+            321 -> "f01a"
 
-            500 -> R.drawable.sprinkle_2
-            501 -> R.drawable.rain_3
-            502 -> R.drawable.rain_3
-            503 -> R.drawable.rain_3
-            504 -> R.drawable.rain_3
-            511 -> R.drawable.sleet_2
-            520 -> if (isDay) R.drawable.sprinkle else R.drawable.sprinkle_1
-            521 -> if (isDay) R.drawable.sprinkle else R.drawable.sprinkle_1
-            522 -> if (isDay) R.drawable.sprinkle else R.drawable.sprinkle_1
-            531 -> if (isDay) R.drawable.sprinkle else R.drawable.sprinkle_1
+            500 -> "f01a"
+            501 -> "f019"
+            502 -> "f019"
+            503 -> "f019"
+            504 -> "f019"
+            511 -> "f017"
+            520 -> "f01a"
+            521 -> "f01a"
+            522 -> "f01a"
+            531 -> "f01a"
 
-            600 -> R.drawable.snowy
-            601 -> R.drawable.snowy
-            602 -> R.drawable.snowy
-            611 -> R.drawable.sleet_2
-            612 -> if (isDay) R.drawable.sleet else R.drawable.sleet_1
-            615 -> R.drawable.sleet_2
-            616 -> R.drawable.sleet_2
-            620 -> if (isDay) R.drawable.snowy_1 else R.drawable.snowy_2
-            621 -> if (isDay) R.drawable.snowy_1 else R.drawable.snowy_2
-            622 -> if (isDay) R.drawable.snowy_1 else R.drawable.snowy_2
+            600 -> "f01b"
+            601 -> "f01b"
+            602 -> "f01b"
+            611 -> "f0b5"
+            612 -> "f017"
+            615 -> "f017"
+            616 -> "f017"
+            620 -> "f0b5"
+            621 -> "f0b5"
+            622 -> "f0b5"
 
-            701 -> R.drawable.haze
-            711 -> R.drawable.haze
-            721 -> R.drawable.haze
-            731 -> R.drawable.storm_2
-            741 -> R.drawable.haze
-            751 -> R.drawable.storm_2
-            761 -> R.drawable.storm_2
-            762 -> R.drawable.haze
-            771 -> R.drawable.wind
-            781 -> R.drawable.tornado
+            701 -> "f014"
+            711 -> "f014"
+            721 -> "f014"
+            731 -> "f063"
+            741 -> "f014"
+            751 -> "f082"
+            761 -> "f063"
+            762 -> "f014"
+            771 -> "f021"
+            781 -> "f056"
 
-            800 -> if (isDay) R.drawable.sun else R.drawable.moon
-            801 -> if (isDay) R.drawable.sunny else R.drawable.cloudy_night
-            802 -> if (isDay) R.drawable.sunny else R.drawable.cloudy_night
-            803 -> if (isDay) R.drawable.cloudy_night_2 else R.drawable.cloudy_night
-            804 -> R.drawable.cloud
+            800 -> if (isDay) "f00d" else "f02e"
+            801 -> if (isDay) "f002" else "f086"
+            802 -> "f041"
+            803 -> "f041"
+            804 -> "f013"
 
-            900 -> R.drawable.tornado
-            901 -> R.drawable.storm_21
-            902 -> R.drawable.hurricane_1
-            903 -> if (isDay) R.drawable.sun else R.drawable.moon
-            904 -> if (isDay) R.drawable.sun else R.drawable.moon
-            905 -> R.drawable.wind
-            906 -> R.drawable.hail_2
+            900 -> "f056"
+            901 -> "f073"
+            902 -> "f073"
+            903 -> "f076"
+            904 -> "f072"
+            905 -> "f021"
+            906 -> "f015"
 
-            951 -> if (isDay) R.drawable.sun else R.drawable.moon
-            952 -> if (isDay) R.drawable.wind_13 else R.drawable.wind
-            953 -> if (isDay) R.drawable.wind_13 else R.drawable.wind
-            954 -> if (isDay) R.drawable.wind_13 else R.drawable.wind
-            955 -> if (isDay) R.drawable.wind_13 else R.drawable.wind
-            956 -> R.drawable.wind
-            957 -> R.drawable.wind
-            958 -> R.drawable.wind
-            959 -> R.drawable.wind
-            960 -> R.drawable.storm_21
-            961 -> R.drawable.storm_21
-            962 -> R.drawable.hurricane_1
-            else -> R.drawable.sunny
+            951 -> if (isDay) "f00d" else "f02e"
+            952 -> "f021"
+            953 -> "f021"
+            954 -> "f021"
+            955 -> "f021"
+            956 -> "f050"
+            957 -> "f050"
+            958 -> "f050"
+            959 -> "f050"
+            960 -> "f01e"
+            961 -> "f01e"
+            962 -> "f073"
+            else -> "f00d"
         }
+    }
+
+    fun processBmp(code: String?, context: Context): Bitmap {
+        val tv = TextView(context)
+        tv.typeface = WeatherFonts.getWeather(context)
+        tv.setTextColor(Color.WHITE)
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, 110f)
+        tv.textAlignment = View.TEXT_ALIGNMENT_CENTER
+        tv.setText(Html.fromHtml("&#x$code", 0), TextView.BufferType.SPANNABLE)
+
+        val bmp = Bitmap.createBitmap(150, 150, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bmp)
+        tv.layout(0, 0, bmp.width, bmp.height)
+        tv.draw(canvas)
+
+        return bmp
     }
 }

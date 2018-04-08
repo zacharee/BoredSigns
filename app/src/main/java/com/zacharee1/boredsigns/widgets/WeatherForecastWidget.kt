@@ -22,7 +22,7 @@ class WeatherForecastWidget : AppWidgetProvider() {
     private var tempHigh: ArrayList<String>? = null
     private var tempLow: ArrayList<String>? = null
     private var loc: String? = null
-    private var icon: ArrayList<Int>? = null
+    private var icon: ArrayList<String>? = null
     private var times: ArrayList<String>? = null
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
@@ -57,7 +57,7 @@ class WeatherForecastWidget : AppWidgetProvider() {
         intent?.let {
             tempHigh = it.getStringArrayListExtra(WeatherService.EXTRA_TEMP)
             loc = it.getStringExtra(WeatherService.EXTRA_LOC)
-            icon = it.getIntegerArrayListExtra(WeatherService.EXTRA_ICON)
+            icon = it.getStringArrayListExtra(WeatherService.EXTRA_ICON)
             times = it.getStringArrayListExtra(WeatherService.EXTRA_TIME)
             tempLow = it.getStringArrayListExtra(WeatherService.EXTRA_TEMP_EX)
         }
@@ -104,7 +104,7 @@ class WeatherForecastWidget : AppWidgetProvider() {
 
             for (i in 0 until (tempLow?.size ?: 5)) {
                 val view = RemoteViews(context.packageName, R.layout.weather_forecast_block)
-                if (icon != null) view.setImageViewResource(R.id.icon, icon?.get(i) ?: R.drawable.sunny)
+                if (icon != null) view.setImageViewBitmap(R.id.icon, Utils.processBmp(icon?.get(i), context))
                 view.setTextViewText(R.id.tempHigh, tempHigh?.get(i))
                 view.setTextViewText(R.id.tempLow, tempLow?.get(i))
 

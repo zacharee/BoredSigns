@@ -10,8 +10,7 @@
     <ImageView
         android:id="@+id/icon"
         android:layout_width="match_parent"
-        android:layout_height="75px"
-        app:srcCompat="@drawable/sun" />
+        android:layout_height="75px" />
 
     <LinearLayout
         android:orientation="horizontal"

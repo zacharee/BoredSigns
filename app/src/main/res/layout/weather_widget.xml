@@ -12,8 +12,7 @@
         android:layout_above="@+id/time"
         android:layout_alignParentLeft="true"
         android:paddingLeft="12px"
-        android:paddingRight="12px"
-        app:srcCompat="@drawable/sun" />
+        android:paddingRight="12px" />
 
     <TextView
         android:id="@+id/title"
