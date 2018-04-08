@@ -2,12 +2,8 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <Preference
-        android:title="@string/edit_screen_on">
-        <intent
-            android:targetClass="com.lge.signboard.settings.SBSettingContents"
-            android:targetPackage="com.lge.signboard.settings"
-            android:action="android.intent.action.MAIN" />
-    </Preference>
+        android:title="@string/edit_screen_on"
+        android:key="screen_on" />
 
     <Preference
         android:title="@string/edit_aod">
