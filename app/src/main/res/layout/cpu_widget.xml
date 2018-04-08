@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/content"
+    android:layout_width="1040px"
+    android:layout_height="160px"
+    android:layoutDirection="ltr"
+    android:orientation="horizontal"
+    android:padding="12px">
+
+</LinearLayout>

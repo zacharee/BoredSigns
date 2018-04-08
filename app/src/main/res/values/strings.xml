@@ -11,10 +11,12 @@
     <string name="navbar_widget_title">Navigation Bar Screen</string>
     <string name="dev_widget_1_title">Developer Info Screen 1</string>
     <string name="dev_widget_2_title">Developer Info Screen 2</string>
+    <string name="cpu_widget_title">CPU Usage Info</string>
 
     <!--Widget Summaries-->
     <string name="dev_widget_1_desc">FPS, RAM, Charge Rate</string>
     <string name="dev_widget_2_desc">CPU Temp, GPU Temp, Battery Temp</string>
+    <string name="cpu_widget_desc">CPU Usage in %, CPU core frequency in MHz</string>
 
     <!--Preference Category Titles-->
     <string name="battery">Battery</string>

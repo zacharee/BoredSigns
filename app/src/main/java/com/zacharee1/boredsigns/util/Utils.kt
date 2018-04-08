@@ -4,19 +4,20 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.graphics.*
-import android.os.Bundle
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.os.Bundle
 import android.text.Html
 import android.util.TypedValue
-import android.view.Gravity
 import android.view.View
 import android.widget.TextView
-import com.android.internal.R.attr.typeface
-import com.zacharee1.boredsigns.R
-import java.util.*
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 
 object Utils {
@@ -220,5 +221,58 @@ object Utils {
         tv.draw(canvas)
 
         return bmp
+    }
+
+    private var cpuLast = arrayListOf("0", "0", "0", "0", "0", "0")
+    private var cpuLastSum = 0
+
+    fun parseCpuInfo(): ArrayList<String> {
+//        val proc = Runtime.getRuntime().exec("top -n 1 -m 1")
+//        val reader = BufferedReader(InputStreamReader(proc.inputStream))
+//        proc.waitFor()
+//
+//        val line = reader.readLine()
+//        val split = line.trim().split(", ")
+//
+//        reader.close()
+//        proc.destroy()
+
+        val proc = Runtime.getRuntime().exec("head -1 /proc/stat")
+        val reader = BufferedReader(InputStreamReader(proc.inputStream))
+        proc.waitFor()
+
+        val line = reader.readLine()
+        val split = ArrayList(line.replace("cpu", "").trim().split(" "))
+
+        val user = split[0].toInt()
+        val nice = split[1].toInt()
+        val system = split[2].toInt()
+        val idle = split[3].toInt()
+        val iowait = split[4].toInt()
+        val irq = split[5].toInt()
+        val softirq = split[6].toInt()
+        val steal = split[7].toInt()
+
+        val sum = user + nice + system + idle + iowait + irq + softirq + steal
+        val delta = sum - cpuLastSum
+        val idleDelta = (split[4].toInt() + split[3].toInt()) - (cpuLast[4].toInt() + cpuLast[3].toInt())
+        val used = delta - idleDelta
+        val percent = 100 * used / delta
+
+        cpuLast = split
+        cpuLastSum = sum
+
+        val ret = arrayListOf("$percent% Load")
+
+        for (i in 0 until Runtime.getRuntime().availableProcessors()) {
+            val freqProc = Runtime.getRuntime().exec("cat /sys/devices/system/cpu/cpu$i/cpufreq/scaling_cur_freq")
+            val freqReader = BufferedReader(InputStreamReader(freqProc.inputStream))
+            freqProc.waitFor()
+
+            val freq = freqReader.readLine().toInt() / 1000
+            ret.add("$freq MHz")
+        }
+
+        return ret
     }
 }

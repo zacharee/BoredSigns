@@ -205,6 +205,20 @@
                 android:value="dev_widget_2_desc" />
         </receiver>
         <receiver
+            android:name=".widgets.CPUInfoWidget"
+            android:label="@string/cpu_widget_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/cpu_widget_info" />
+            <meta-data
+                android:name="com.lge.signboard.widget.description"
+                android:value="cpu_widget_desc" />
+        </receiver>
+        <receiver
             android:name=".receivers.BootReceiver"
             android:enabled="true"
             android:exported="true">
@@ -243,6 +257,10 @@
             android:exported="true" />
         <service
             android:name=".services.Dev2Service"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".services.CPUInfoService"
             android:enabled="true"
             android:exported="true" />
         <service android:name=".services.FirebaseService">
