@@ -257,7 +257,7 @@ object Utils {
         val delta = sum - cpuLastSum
         val idleDelta = (split[4].toInt() + split[3].toInt()) - (cpuLast[4].toInt() + cpuLast[3].toInt())
         val used = delta - idleDelta
-        val percent = 100 * used / delta
+        val percent = 100 * used / if (delta == 0) 1 else delta
 
         cpuLast = split
         cpuLastSum = sum
