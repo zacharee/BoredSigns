@@ -11,7 +11,6 @@ import android.provider.Settings
 import android.widget.RemoteViews
 import android.widget.Toast
 import com.zacharee1.boredsigns.R
-import com.zacharee1.boredsigns.activities.PermissionsActivity
 import com.zacharee1.boredsigns.util.Utils
 import com.zacharee1.boredsigns.views.NavBarButton
 
@@ -22,15 +21,13 @@ class NavBarWidget : AppWidgetProvider() {
     }
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        for (perm in PermissionsActivity.REQUEST) {
-            val enabledServices = Settings.Secure.getString(context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
-            if (enabledServices == null || !enabledServices.contains(context.packageName)) {
-                val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                context.startActivity(intent)
-                Toast.makeText(context, context.resources.getText(R.string.enable_accessibility), Toast.LENGTH_LONG).show()
-                return
-            }
+        val enabledServices = Settings.Secure.getString(context.contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
+        if (enabledServices == null || !enabledServices.contains(context.packageName)) {
+            val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(intent)
+            Toast.makeText(context, context.resources.getText(R.string.enable_accessibility), Toast.LENGTH_LONG).show()
+            return
         }
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)

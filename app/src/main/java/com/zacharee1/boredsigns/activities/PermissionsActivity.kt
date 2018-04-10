@@ -4,11 +4,8 @@ import android.Manifest
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import com.zacharee1.boredsigns.fragments.WeatherFragment
-import com.zacharee1.boredsigns.widgets.ImageWidget
-import com.zacharee1.boredsigns.widgets.InfoWidget
+import android.support.v7.app.AppCompatActivity
 
 class PermissionsActivity : AppCompatActivity() {
     companion object {
@@ -55,12 +52,14 @@ class PermissionsActivity : AppCompatActivity() {
     }
 
     private fun updateAll() {
-        val man = AppWidgetManager.getInstance(this)
-        val ids = man.getAppWidgetIds(ComponentName(this, klass))
-        val updateIntent = Intent()
-        updateIntent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-        updateIntent.putExtra("appWidgetIds", ids)
-        updateIntent.component = ComponentName(this, klass)
-        sendBroadcast(updateIntent)
+        try {
+            val man = AppWidgetManager.getInstance(this)
+            val ids = man.getAppWidgetIds(ComponentName(this, klass))
+            val updateIntent = Intent()
+            updateIntent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+            updateIntent.putExtra("appWidgetIds", ids)
+            updateIntent.component = ComponentName(this, klass)
+            sendBroadcast(updateIntent)
+        } catch (e: Exception) {}
     }
 }
