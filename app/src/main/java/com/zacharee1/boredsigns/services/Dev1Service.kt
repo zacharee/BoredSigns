@@ -4,13 +4,14 @@ import android.app.ActivityManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.os.*
+import android.os.BatteryManager
+import android.os.IBinder
 import android.view.Choreographer
-import com.zacharee1.boredsigns.util.Utils
-import com.zacharee1.boredsigns.widgets.Dev1Widget
 import android.view.WindowManager
 import com.codemonkeylabs.fpslibrary.Calculation
 import com.codemonkeylabs.fpslibrary.FPSConfig
+import com.zacharee1.boredsigns.util.Utils
+import com.zacharee1.boredsigns.widgets.Dev1Widget
 
 
 class Dev1Service : Service() {
@@ -21,6 +22,7 @@ class Dev1Service : Service() {
     }
 
     private lateinit var choreographer: Choreographer
+    private lateinit var callback: FPSFrameCallback
 
     override fun onBind(intent: Intent): IBinder? {
         return null
@@ -28,20 +30,26 @@ class Dev1Service : Service() {
 
     override fun onCreate() {
         choreographer = Choreographer.getInstance()
-        startListening()
-        super.onCreate()
-    }
 
-    private fun startListening() {
-        val config = object : FPSConfig() {
-
-        }
+        val config = object : FPSConfig() {}
         val display = (getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
 
         config.deviceRefreshRateInMs = 1000 / display.refreshRate
         config.refreshRate = display.refreshRate
 
-        choreographer.postFrameCallback(FPSFrameCallback(config, this))
+        callback = FPSFrameCallback(config, this)
+        startListening()
+        super.onCreate()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        choreographer.removeFrameCallback(callback)
+    }
+
+    private fun startListening() {
+        choreographer.postFrameCallback(callback)
     }
 
 

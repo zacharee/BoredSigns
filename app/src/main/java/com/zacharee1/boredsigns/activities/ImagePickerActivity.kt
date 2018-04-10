@@ -1,19 +1,19 @@
 package com.zacharee1.boredsigns.activities
 
 import android.app.Activity
-import android.appwidget.AppWidgetManager
-import android.content.ComponentName
 import android.content.Intent
-import android.net.Uri
-import android.support.v7.app.AppCompatActivity
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.support.v7.app.AppCompatActivity
+import android.util.Base64
 import com.theartofdev.edmodo.cropper.CropImage
 import com.zacharee1.boredsigns.R
-import com.zacharee1.boredsigns.services.InfoService
 import com.zacharee1.boredsigns.util.Utils
 import com.zacharee1.boredsigns.widgets.ImageWidget
 import com.zacharee1.boredsigns.widgets.NavBarWidget
+import java.io.ByteArrayOutputStream
 
 class ImagePickerActivity : AppCompatActivity() {
     companion object {
@@ -53,7 +53,14 @@ class ImagePickerActivity : AppCompatActivity() {
         } else if (requestCode == SELECT_NAV_ICON) {
             val uri = data?.data
             uri?.let {
-                PreferenceManager.getDefaultSharedPreferences(this).edit().putString(intent.getStringExtra("key"), uri.toString()).apply()
+                val bmp = Utils.getResizedBitmap(BitmapFactory.decodeStream(contentResolver.openInputStream(uri)), 100, 100)
+                val stream = ByteArrayOutputStream()
+
+                bmp.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                val array = stream.toByteArray()
+                val encoded = Base64.encodeToString(array, Base64.DEFAULT)
+
+                PreferenceManager.getDefaultSharedPreferences(this).edit().putString(intent.getStringExtra("key"), encoded).apply()
                 Utils.sendWidgetUpdate(this, NavBarWidget::class.java, null)
             }
             finish()

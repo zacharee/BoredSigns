@@ -3,20 +3,15 @@ package com.zacharee1.boredsigns.widgets
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.preference.PreferenceManager
 import android.provider.Settings
 import android.widget.RemoteViews
 import android.widget.Toast
-
 import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.activities.PermissionsActivity
-import com.zacharee1.boredsigns.services.NavBarAccessibility
 import com.zacharee1.boredsigns.util.Utils
 import com.zacharee1.boredsigns.views.NavBarButton
 
@@ -51,7 +46,7 @@ class NavBarWidget : AppWidgetProvider() {
             val navButton = NavBarButton(context, button)
 
             val new = RemoteViews(context.packageName, navButton.layoutId)
-            new.setImageViewBitmap(R.id.image, Utils.getResizedBitmap(Utils.drawableToBitmap(navButton.icon), 100, 100))
+            new.setImageViewBitmap(R.id.image, Utils.getResizedBitmap(navButton.icon, 100, 100))
             new.setInt(R.id.image, "setColorFilter", prefs.getInt("nav_button_color", Color.WHITE))
             val pendingIntent = PendingIntent.getBroadcast(context, 0, Intent(navButton.info?.action ?: ""), 0)
             new.setOnClickPendingIntent(R.id.button, pendingIntent)

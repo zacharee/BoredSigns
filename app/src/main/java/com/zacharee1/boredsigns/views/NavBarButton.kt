@@ -2,18 +2,15 @@ package com.zacharee1.boredsigns.views
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.graphics.Rect
-import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.preference.PreferenceManager
+import android.util.Base64
 import android.widget.ImageView
 import android.widget.LinearLayout
 import com.zacharee1.boredsigns.R
-import com.zacharee1.boredsigns.activities.ImagePickerActivity
 import com.zacharee1.boredsigns.services.NavBarAccessibility
 import com.zacharee1.boredsigns.util.Utils
 
@@ -53,13 +50,14 @@ class NavBarButton(context: Context, var key: String?) : LinearLayout(context) {
             return if (which != 0) context.resources.getString(which) else ""
         }
 
-    val icon: Drawable
+    val icon: Bitmap
         get() {
-            val prefUri = PreferenceManager.getDefaultSharedPreferences(context).getString(key, null)
+            val encodedBmp = PreferenceManager.getDefaultSharedPreferences(context).getString(key, null)
             return try {
-                Drawable.createFromStream(context.contentResolver.openInputStream(Uri.parse(prefUri)), prefUri) ?: throw NullPointerException()
+                val decodedByteArray = Base64.decode(encodedBmp, Base64.DEFAULT)
+                BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.size) ?: throw NullPointerException()
             } catch (e: NullPointerException) {
-                context.resources.getDrawable(R.drawable.ic_help_outline_black_24dp, null)
+                Utils.drawableToBitmap(context.resources.getDrawable(info?.icon ?: R.drawable.ic_help_outline_black_24dp, null))
             }
         }
 
@@ -91,7 +89,7 @@ class NavBarButton(context: Context, var key: String?) : LinearLayout(context) {
 
     private fun setIcon() {
         findViewById<ImageView>(R.id.image)?.let {
-            it.setImageBitmap(Utils.drawableToBitmap(icon))
+            it.setImageBitmap(icon)
             it.setColorFilter(PreferenceManager.getDefaultSharedPreferences(context).getInt("nav_button_color", Color.WHITE))
         }
     }
