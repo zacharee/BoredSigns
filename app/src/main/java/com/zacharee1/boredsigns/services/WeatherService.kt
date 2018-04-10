@@ -7,8 +7,6 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.*
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
@@ -17,13 +15,11 @@ import android.os.IBinder
 import android.os.SystemClock
 import android.preference.PreferenceManager
 import android.support.v4.content.LocalBroadcastManager
-import android.util.Log
 import android.widget.Toast
 import com.google.android.gms.location.*
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.zacharee1.boredsigns.App
 import com.zacharee1.boredsigns.R
-import com.zacharee1.boredsigns.proxies.WeatherProxy
 import com.zacharee1.boredsigns.util.Utils
 import com.zacharee1.boredsigns.widgets.WeatherForecastWidget
 import com.zacharee1.boredsigns.widgets.WeatherWidget
@@ -37,8 +33,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.json.JSONObject
 import java.io.BufferedReader
-import java.io.FileNotFoundException
-import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
@@ -67,7 +61,7 @@ class WeatherService : Service() {
     private var useCelsius: Boolean = true
     private lateinit var prefs: SharedPreferences
 
-    private lateinit var locClient: FusedLocationProviderClient
+    private var locClient: FusedLocationProviderClient? = null
     private lateinit var alarmManager: AlarmManager
 
     private lateinit var alarmIntent: PendingIntent
@@ -160,7 +154,7 @@ class WeatherService : Service() {
                     val lon = prefs.getFloat("weather_lon", -0.076132F).toDouble()
                     getWeather(lat, lon)
                 } else if (checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    locClient.lastLocation.addOnCompleteListener {
+                    locClient?.lastLocation?.addOnCompleteListener {
                         it.result?.let {
                             val lat = it.latitude
                             val lon = it.longitude
@@ -277,12 +271,12 @@ class WeatherService : Service() {
 
     private fun startLocationUpdates() {
         if (checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            locClient.requestLocationUpdates(locReq, locCallback, null)
+            locClient?.requestLocationUpdates(locReq, locCallback, null)
         }
     }
 
     private fun stopLocationUpdates() {
-        locClient.removeLocationUpdates(locCallback)
+        locClient?.removeLocationUpdates(locCallback)
     }
 
     private fun isCurrentActivated(): Boolean {
