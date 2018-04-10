@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="1040px"
+    android:layout_height="160px"
+    android:gravity="center">
+
+    <ImageView
+        android:id="@+id/vol_ico"
+        android:layout_width="80px"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_ring_volume_black_24dp"
+        android:tint="#fff" />
+
+    <ImageView
+        android:id="@+id/vol_down"
+        android:focusable="true"
+        android:clickable="true"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_keyboard_arrow_down_black_24dp"
+        android:tint="#fff"
+        android:layout_width="160px"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="16px"
+        android:layout_marginStart="16px"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingTop="32px">
+
+        <ProgressBar
+            android:id="@+id/vol_stat"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="false"
+            android:max="10"
+            android:progress="5"
+            android:progressTint="#fff" />
+
+        <TextView
+            android:id="@+id/vol_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/ringer"
+            android:textAlignment="center"
+            android:textColor="#fff"
+            android:textSize="48px" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/vol_up"
+        android:focusable="true"
+        android:clickable="true"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_keyboard_arrow_up_black_24dp"
+        android:tint="#fff"
+        android:layout_width="160px"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

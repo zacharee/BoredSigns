@@ -12,6 +12,8 @@
     <string name="dev_widget_1_title">Developer Info Screen 1</string>
     <string name="dev_widget_2_title">Developer Info Screen 2</string>
     <string name="cpu_widget_title">CPU Usage Info</string>
+    <string name="ringer_widget_title">Ringer Volume Widget</string>
+    <string name="media_widget_title">Media Volume Widget</string>
 
     <!--Widget Summaries-->
     <string name="dev_widget_1_desc">FPS, RAM, Charge Rate</string>
@@ -60,6 +62,8 @@
 
     <!--Titles-->
     <string name="not_compat_title">Not Compatible!</string>
+    <string name="ringer">Ringer</string>
+    <string name="media">Media</string>
 
     <!--Misc-->
     <string name="select_image">Select Image</string>

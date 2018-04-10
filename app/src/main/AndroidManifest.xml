@@ -100,7 +100,8 @@
         <activity
             android:name=".activities.NavBarConfigureActivity"
             android:exported="true" />
-        <activity android:name=".activities.NotSupportedActivity"
+        <activity
+            android:name=".activities.NotSupportedActivity"
             android:theme="@style/AppTheme.Null" />
 
         <receiver
@@ -219,6 +220,28 @@
                 android:value="cpu_widget_desc" />
         </receiver>
         <receiver
+            android:name=".widgets.RingerVolumeWidget"
+            android:label="@string/ringer_widget_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/volume_widget_info" />
+        </receiver>
+        <receiver
+            android:name=".widgets.MediaVolumeWidget"
+            android:label="@string/media_widget_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/volume_widget_info" />
+        </receiver>
+        <receiver
             android:name=".receivers.BootReceiver"
             android:enabled="true"
             android:exported="true">
@@ -281,6 +304,11 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorAccent" />
+
+        <service
+            android:name=".services.VolumeService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>
