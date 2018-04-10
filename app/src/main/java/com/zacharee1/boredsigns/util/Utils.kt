@@ -265,12 +265,14 @@ object Utils {
         val ret = arrayListOf("$percent% Load")
 
         for (i in 0 until Runtime.getRuntime().availableProcessors()) {
-            val freqProc = Runtime.getRuntime().exec("cat /sys/devices/system/cpu/cpu$i/cpufreq/scaling_cur_freq")
+                val freqProc = Runtime.getRuntime().exec("cat /sys/devices/system/cpu/cpu$i/cpufreq/scaling_cur_freq")
             val freqReader = BufferedReader(InputStreamReader(freqProc.inputStream))
             freqProc.waitFor()
 
-            val freq = freqReader.readLine().toInt() / 1000
-            ret.add("$freq MHz")
+            try {
+                val freq = freqReader.readLine().toInt() / 1000
+                ret.add("$freq MHz")
+            } catch (e: Exception) {}
         }
 
         return ret
