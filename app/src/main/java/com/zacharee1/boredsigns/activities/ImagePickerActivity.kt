@@ -28,7 +28,14 @@ class ImagePickerActivity : AppCompatActivity() {
         val intent = Intent()
         intent.type = "image/*"
         intent.action = Intent.ACTION_GET_CONTENT
-        startActivityForResult(Intent.createChooser(intent, resources.getText(R.string.select_image)), ImagePickerActivity@this.intent.data.toString().toInt())
+        intent.data = this.intent.data
+
+        if (intent.data == null) {
+            finish()
+            return
+        }
+
+        startActivityForResult(Intent.createChooser(intent, resources.getText(R.string.select_image)), intent.data.toString().toInt())
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
