@@ -25,17 +25,16 @@ class ImagePickerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_image_picker)
 
-        val intent = Intent()
-        intent.type = "image/*"
-        intent.action = Intent.ACTION_GET_CONTENT
-        intent.data = this.intent.data
+        val newIntent = Intent()
 
         if (intent.data == null) {
             finish()
-            return
-        }
+        } else {
+            newIntent.type = "image/*"
+            newIntent.action = Intent.ACTION_GET_CONTENT
 
-        startActivityForResult(Intent.createChooser(intent, resources.getText(R.string.select_image)), intent.data.toString().toInt())
+            startActivityForResult(Intent.createChooser(newIntent, resources.getText(R.string.select_image)), intent.data.toString().toInt())
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
