@@ -5,6 +5,7 @@ import android.content.ComponentName
 import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceFragment
+import android.widget.Toast
 import com.zacharee1.boredsigns.R
 
 class MainFragment : PreferenceFragment() {
@@ -26,7 +27,11 @@ class MainFragment : PreferenceFragment() {
                         .setTitle(R.string.error_launching_config)
                         .setMessage(R.string.unable_to_directly_launch_settings)
                         .setPositiveButton(android.R.string.ok, { _, _ ->
-                            startActivity(Intent("com.lge.signboard.mainSettings"))
+                            try {
+                                startActivity(Intent("com.lge.signboard.mainSettings"))
+                            } catch (e: Exception) {
+                                Toast.makeText(context, resources.getText(R.string.error_launching_config), Toast.LENGTH_SHORT).show()
+                            }
                         })
                         .setNegativeButton(android.R.string.cancel, null)
                         .show()

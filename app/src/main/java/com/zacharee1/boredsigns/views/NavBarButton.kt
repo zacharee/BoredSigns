@@ -58,6 +58,8 @@ class NavBarButton(context: Context, var key: String?) : LinearLayout(context) {
                 BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.size) ?: throw NullPointerException()
             } catch (e: NullPointerException) {
                 Utils.drawableToBitmap(context.resources.getDrawable(info?.icon ?: R.drawable.ic_help_outline_black_24dp, null))
+            } catch (e: IllegalArgumentException) {
+                Utils.drawableToBitmap(context.resources.getDrawable(info?.icon ?: R.drawable.ic_help_outline_black_24dp, null))
             }
         }
 
