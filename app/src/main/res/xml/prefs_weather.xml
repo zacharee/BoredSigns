@@ -25,7 +25,7 @@
         android:summary="@string/weather_icon_attr">
         <intent
             android:action="android.intent.action.VIEW"
-            android:data="https://www.flaticon.com/authors/pixel-perfect" />
+            android:data="http://erikflowers.github.io/weather-icons/" />
     </Preference>
 
 </PreferenceScreen>

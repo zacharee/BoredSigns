@@ -55,7 +55,7 @@
     <!--Explanations-->
     <string name="accessibility_service">BoredSigns\' Accessibility Service is used for the Navigation Bar widget. It allows the back, home, recents, splitscreen, notification, power and qs buttons to function. This service is not used for anything else.</string>
     <string name="location_services_needed">Location Services must be ON to use this feature.</string>
-    <string name="weather_icon_attr">Icons made by Pixel Perfect on www.flaticon.com</string>
+    <string name="weather_icon_attr">Icons made by Erik Flowers on GitHub</string>
     <string name="not_compat_message">Your device isn\'t compatible with BoredSigns.</string>
     <string name="play_services_not_available">Play Services unavailable.</string>
     <string name="unable_to_directly_launch_settings">Unable to directly launch the screen-on settings. After tapping \"OK,\" tap \"Show when main screen on.\"</string>

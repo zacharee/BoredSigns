@@ -1,6 +1,7 @@
 package com.zacharee1.boredsigns.services
 
 import android.Manifest
+import android.annotation.RequiresPermission
 import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -147,23 +148,53 @@ class WeatherService : Service() {
         when (action) {
             ACTION_UPDATE_WEATHER -> {
                 useCelsius = prefs.getBoolean(WHICH_UNIT, true)
-
                 val locMan = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-                if ((!locMan.isProviderEnabled(LocationManager.GPS_PROVIDER) && !locMan.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) || !prefs.getBoolean("use_location", true)) {
-                    val lat = prefs.getFloat("weather_lat", 51.508530F).toDouble()
-                    val lon = prefs.getFloat("weather_lon", -0.076132F).toDouble()
-                    getWeather(lat, lon)
-                } else if (checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    locClient?.lastLocation?.addOnCompleteListener {
-                        it.result?.let {
-                            val lat = it.latitude
-                            val lon = it.longitude
-                            getWeather(lat, lon)
+
+                if (checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    if ((!locMan.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                                    && !locMan.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
+                            || !prefs.getBoolean("use_location", true)) {
+                        locClient?.locationAvailability?.addOnCompleteListener {
+                            if (it.result.isLocationAvailable) {
+                                getCurrentLocWeather()
+                            } else {
+                                getSavedLocWeather()
+                            }
                         }
+                    } else {
+                        getCurrentLocWeather()
                     }
+                } else {
+                    getSavedLocWeather()
                 }
             }
         }
+    }
+
+    @RequiresPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+    private fun getCurrentLocWeather() {
+        try {
+            locClient?.lastLocation?.addOnCompleteListener {
+                it.result?.let {
+                    val lat = it.latitude
+                    val lon = it.longitude
+                    getWeather(lat, lon)
+                }
+            }
+        } catch (e: SecurityException) {
+            getSavedLocWeather()
+        }
+    }
+
+    private fun getSavedLocWeather() {
+        val loc = getSavedLoc()
+        getWeather(loc.lat, loc.lon)
+    }
+
+    private fun getSavedLoc(): Loc {
+        val lat = prefs.getFloat("weather_lat", 51.508530F).toDouble()
+        val lon = prefs.getFloat("weather_lon", -0.076132F).toDouble()
+        return Loc(lat, lon)
     }
 
     private fun getWeather(lat: Double, lon: Double) {
@@ -393,4 +424,6 @@ class WeatherService : Service() {
         fun onSuccess(model: ForecastResponseModel)
         fun onFail(message: String)
     }
+
+    class Loc(var lat: Double, var lon: Double)
 }

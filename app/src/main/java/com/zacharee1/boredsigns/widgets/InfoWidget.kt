@@ -1,13 +1,14 @@
 package com.zacharee1.boredsigns.widgets
 
 import android.Manifest
-import android.app.ActivityManager
-import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
-import android.content.*
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -30,10 +31,9 @@ import android.view.View
 import android.widget.RemoteViews
 import android.widget.Toast
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.zacharee1.boredsigns.services.InfoService
-
 import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.activities.PermissionsActivity
+import com.zacharee1.boredsigns.services.InfoService
 import com.zacharee1.boredsigns.util.Utils
 import java.util.*
 
@@ -96,7 +96,7 @@ class InfoWidget : AppWidgetProvider() {
         mPrefs = PreferenceManager.getDefaultSharedPreferences(context)
     }
 
-    override fun onReceive(context: Context?, intent: Intent?) {
+    override fun onReceive(context: Context, intent: Intent?) {
         val rank = intent?.getBooleanExtra(InfoService.RANKING_LIST, false)
 
         rank?.let { if (it) InfoService.RANKING?.let {
@@ -457,20 +457,20 @@ class InfoWidget : AppWidgetProvider() {
         fun updateState(level: Int) {
             this.level = level
 
-            when (level) {
-                0 -> imageResource = R.drawable.ic_signal_wifi_0_bar_black_24dp
-                1 -> imageResource = R.drawable.ic_signal_wifi_1_bar_black_24dp
-                2 -> imageResource = R.drawable.ic_signal_wifi_2_bar_black_24dp
-                3 -> imageResource = R.drawable.ic_signal_wifi_3_bar_black_24dp
-                4 -> imageResource = R.drawable.ic_signal_wifi_4_bar_black_24dp
-                else -> imageResource = R.drawable.ic_signal_wifi_null_black_24dp
+            imageResource = when (level) {
+                0 -> R.drawable.ic_signal_wifi_0_bar_black_24dp
+                1 -> R.drawable.ic_signal_wifi_1_bar_black_24dp
+                2 -> R.drawable.ic_signal_wifi_2_bar_black_24dp
+                3 -> R.drawable.ic_signal_wifi_3_bar_black_24dp
+                4 -> R.drawable.ic_signal_wifi_4_bar_black_24dp
+                else -> R.drawable.ic_signal_wifi_null_black_24dp
             }
         }
     }
 
-    class NotificationState(context: Context?, private val notification: StatusBarNotification?, val info: NotificationListenerService.Ranking) {
+    class NotificationState(context: Context, private val notification: StatusBarNotification?, val info: NotificationListenerService.Ranking) {
         var show: Boolean = info.importance > NotificationManager.IMPORTANCE_MIN
-        var icon: Drawable? = context?.resources?.getDrawable(R.drawable.ic_android_black_24dp, null)
+        var icon: Drawable? = context.resources?.getDrawable(R.drawable.ic_android_black_24dp, null)
 
         init {
             try {

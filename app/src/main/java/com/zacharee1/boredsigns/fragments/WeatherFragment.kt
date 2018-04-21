@@ -86,6 +86,7 @@ class WeatherFragment : PreferenceFragment() {
             current.summary = resources.getString(R.string.location_services_needed)
         } else {
             current.isEnabled = true
+            current.summary = null
         }
     }
 }
