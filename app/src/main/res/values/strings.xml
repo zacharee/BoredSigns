@@ -74,4 +74,5 @@
     <string name="tap_to_configure">Tap to Configure</string>
     <string name="error_launching_config">Error launching configuration</string>
     <string name="reset_image_instructions">Long-press an image button to reset the icon.</string>
+    <string name="unable_to_parse_cpu_info">Unable to parse CPU info</string>
 </resources>

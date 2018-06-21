@@ -2,7 +2,11 @@ package com.zacharee1.boredsigns.services
 
 import android.accessibilityservice.AccessibilityService
 import android.annotation.SuppressLint
-import android.content.*
+import android.app.SearchManager
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.view.accessibility.AccessibilityEvent
 import com.zacharee1.boredsigns.util.Utils
@@ -51,15 +55,8 @@ class NavBarAccessibility : AccessibilityService() {
                 POWER -> performGlobalAction(GLOBAL_ACTION_POWER_DIALOG)
 
                 ASSIST -> {
-                    val intent = Intent(Intent.ACTION_VOICE_ASSIST)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-
-                    try {
-                        startActivity(intent)
-                    } catch (e: ActivityNotFoundException) {
-                        intent.action = Intent.ACTION_VOICE_COMMAND
-                        startActivity(intent)
-                    }
+                    val searchMan = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+                    searchMan.launchAssist(null)
                 }
             }
         }

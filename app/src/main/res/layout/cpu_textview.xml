@@ -6,6 +6,7 @@
     android:layout_weight="1"
     android:foregroundGravity="center_vertical"
     android:gravity="center_vertical"
+    android:textColor="#fff"
     android:textAlignment="center">
 
 </TextView>

@@ -4,10 +4,10 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.widget.RemoteViews
 import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.services.CPUInfoService
+import com.zacharee1.boredsigns.util.Utils
 
 class CPUInfoWidget : AppWidgetProvider() {
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
@@ -16,11 +16,18 @@ class CPUInfoWidget : AppWidgetProvider() {
         val views = RemoteViews(context.packageName, R.layout.cpu_widget)
         views.removeAllViews(R.id.content)
 
-        for (s in CPUInfoService.ARRAY) {
+        val info = Utils.parseCpuInfo()
+
+        if (info.isEmpty()) {
             val tv = RemoteViews(context.packageName, R.layout.cpu_textview)
-            tv.setTextViewText(R.id.usage, s)
-            tv.setTextColor(R.id.usage, Color.WHITE)
+            tv.setTextViewText(R.id.usage, context.resources.getText(R.string.unable_to_parse_cpu_info))
             views.addView(R.id.content, tv)
+        } else {
+            for (s in info) {
+                val tv = RemoteViews(context.packageName, R.layout.cpu_textview)
+                tv.setTextViewText(R.id.usage, s)
+                views.addView(R.id.content, tv)
+            }
         }
 
         appWidgetManager.updateAppWidget(appWidgetIds, views)

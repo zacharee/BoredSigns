@@ -75,19 +75,23 @@ object Utils {
         return bitmap
     }
 
-    fun getResizedBitmap(bm: Bitmap, newWidth: Int, newHeight: Int): Bitmap {
-        val width = bm.width
-        val height = bm.height
-        val scaleWidth = newWidth.toFloat() / width
-        val scaleHeight = newHeight.toFloat() / height
-        // CREATE A MATRIX FOR THE MANIPULATION
-        val matrix = Matrix()
-        // RESIZE THE BIT MAP
-        matrix.postScale(scaleWidth, scaleHeight)
+    fun getResizedBitmap(bm: Bitmap?, newWidth: Int, newHeight: Int): Bitmap? {
+        return if (bm == null) {
+            bm
+        } else {
+            val width = bm.width
+            val height = bm.height
+            val scaleWidth = newWidth.toFloat() / width
+            val scaleHeight = newHeight.toFloat() / height
+            // CREATE A MATRIX FOR THE MANIPULATION
+            val matrix = Matrix()
+            // RESIZE THE BIT MAP
+            matrix.postScale(scaleWidth, scaleHeight)
 
-        // "RECREATE" THE NEW BITMAP
-        return Bitmap.createBitmap(
-                bm, 0, 0, width, height, matrix, false)
+            // "RECREATE" THE NEW BITMAP
+            Bitmap.createBitmap(
+                    bm, 0, 0, width, height, matrix, false)
+        }
     }
 
     fun trimBitmap(bmp: Bitmap?): Bitmap? {
@@ -227,52 +231,48 @@ object Utils {
     private var cpuLastSum = 0
 
     fun parseCpuInfo(): ArrayList<String> {
-//        val proc = Runtime.getRuntime().exec("top -n 1 -m 1")
-//        val reader = BufferedReader(InputStreamReader(proc.inputStream))
-//        proc.waitFor()
-//
-//        val line = reader.readLine()
-//        val split = line.trim().split(", ")
-//
-//        reader.close()
-//        proc.destroy()
-
         val proc = Runtime.getRuntime().exec("head -1 /proc/stat")
         val reader = BufferedReader(InputStreamReader(proc.inputStream))
         proc.waitFor()
 
-        val line = reader.readLine()
-        val split = ArrayList(line.replace("cpu", "").trim().split(" "))
+        val ret = ArrayList<String>()
 
-        val user = split[0].toInt()
-        val nice = split[1].toInt()
-        val system = split[2].toInt()
-        val idle = split[3].toInt()
-        val iowait = split[4].toInt()
-        val irq = split[5].toInt()
-        val softirq = split[6].toInt()
-        val steal = split[7].toInt()
+        try {
+            val line = reader.readLine()
+            val split = ArrayList(line.replace("cpu", "").trim().split(" "))
 
-        val sum = user + nice + system + idle + iowait + irq + softirq + steal
-        val delta = sum - cpuLastSum
-        val idleDelta = (split[4].toInt() + split[3].toInt()) - (cpuLast[4].toInt() + cpuLast[3].toInt())
-        val used = delta - idleDelta
-        val percent = 100 * used / if (delta == 0) 1 else delta
+            val user = split[0].toInt()
+            val nice = split[1].toInt()
+            val system = split[2].toInt()
+            val idle = split[3].toInt()
+            val iowait = split[4].toInt()
+            val irq = split[5].toInt()
+            val softirq = split[6].toInt()
+            val steal = split[7].toInt()
 
-        cpuLast = split
-        cpuLastSum = sum
+            val sum = user + nice + system + idle + iowait + irq + softirq + steal
+            val delta = sum - cpuLastSum
+            val idleDelta = (split[4].toInt() + split[3].toInt()) - (cpuLast[4].toInt() + cpuLast[3].toInt())
+            val used = delta - idleDelta
+            val percent = 100 * used / if (delta == 0) 1 else delta
 
-        val ret = arrayListOf("$percent% Load")
+            cpuLast = split
+            cpuLastSum = sum
 
-        for (i in 0 until Runtime.getRuntime().availableProcessors()) {
+            ret.add("$percent% Load")
+
+            for (i in 0 until Runtime.getRuntime().availableProcessors()) {
                 val freqProc = Runtime.getRuntime().exec("cat /sys/devices/system/cpu/cpu$i/cpufreq/scaling_cur_freq")
-            val freqReader = BufferedReader(InputStreamReader(freqProc.inputStream))
-            freqProc.waitFor()
+                val freqReader = BufferedReader(InputStreamReader(freqProc.inputStream))
+                freqProc.waitFor()
 
-            try {
-                val freq = freqReader.readLine().toInt() / 1000
-                ret.add("$freq MHz")
-            } catch (e: Exception) {}
+                try {
+                    val freq = freqReader.readLine().toInt() / 1000
+                    ret.add("$freq MHz")
+                } catch (e: Exception) {}
+            }
+        } catch (e: IllegalStateException) {
+            e.printStackTrace()
         }
 
         return ret

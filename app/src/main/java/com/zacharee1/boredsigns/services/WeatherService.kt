@@ -17,6 +17,7 @@ import android.os.SystemClock
 import android.preference.PreferenceManager
 import android.support.v4.content.LocalBroadcastManager
 import android.widget.Toast
+import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.*
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.zacharee1.boredsigns.App
@@ -33,6 +34,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.json.JSONObject
+import org.json.simple.JSONValue
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
@@ -183,6 +185,14 @@ class WeatherService : Service() {
             }
         } catch (e: SecurityException) {
             getSavedLocWeather()
+        } catch (e: ApiException) {
+            Toast.makeText(this, e.localizedMessage, Toast.LENGTH_SHORT).show()
+
+            val bundle = Bundle()
+            bundle.putString("message", e.localizedMessage)
+
+            FirebaseAnalytics.getInstance(this)
+                    .logEvent("ApiException", bundle)
         }
     }
 
@@ -327,7 +337,7 @@ class WeatherService : Service() {
             val req = template.replace("LAT", lat).replace("LON", lon)
 
             try {
-                Observable.fromCallable({asyncGetJsonString(URL(req))})
+                Observable.fromCallable {asyncGetJsonString(URL(req))}
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
@@ -414,7 +424,7 @@ class WeatherService : Service() {
                     JSONObject("{\"cod\":001, \"message\": \"Unknown Host\"}")
                 } else {
                     e.printStackTrace()
-                    JSONObject("{\"cod\":001, \"message\": \"${e.localizedMessage}\"}")
+                    JSONObject("{\"cod\":001, \"message\": \"${JSONValue.escape(e.localizedMessage)}\"}")
                 }
             }
         }

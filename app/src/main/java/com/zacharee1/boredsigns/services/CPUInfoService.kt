@@ -10,10 +10,6 @@ import com.zacharee1.boredsigns.widgets.CPUInfoWidget
 
 
 class CPUInfoService : Service() {
-    companion object {
-        var ARRAY = Utils.parseCpuInfo()
-    }
-
     private var isRunning = false
 
     override fun onBind(intent: Intent): IBinder? {
@@ -27,8 +23,6 @@ class CPUInfoService : Service() {
     }
 
     private fun startListening() {
-        ARRAY = Utils.parseCpuInfo()
-
         Utils.sendWidgetUpdate(this, CPUInfoWidget::class.java, null)
 
         if (isRunning) {
