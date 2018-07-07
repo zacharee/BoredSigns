@@ -6,7 +6,7 @@ apply plugin: 'kotlin-android-extensions'
 
 apply plugin: 'io.fabric'
 
-project.ext.version = 30
+project.ext.version = 31
 
 android {
     compileSdkVersion 27
@@ -33,7 +33,7 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.50"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.51"
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     implementation 'com.jaredrummler:colorpicker:1.0.2'
@@ -52,7 +52,7 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
     implementation 'io.reactivex.rxjava2:rxjava:2.1.14'
     implementation 'com.github.brianPlummer:tinydancer:0.1.2'
-    implementation 'com.google.firebase:firebase-messaging:17.0.0'
+    implementation 'com.google.firebase:firebase-messaging:17.1.0'
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 }
 

@@ -61,7 +61,7 @@ class ImagePickerActivity : AppCompatActivity() {
                     val bmp = Utils.getResizedBitmap(BitmapFactory.decodeStream(contentResolver.openInputStream(uri)), 100, 100)
                     val stream = ByteArrayOutputStream()
 
-                    bmp.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                    bmp?.compress(Bitmap.CompressFormat.PNG, 100, stream)
                     val array = stream.toByteArray()
                     val encoded = Base64.encodeToString(array, Base64.DEFAULT)
 
