@@ -1,25 +1,22 @@
 package com.zacharee1.boredsigns.services
 
-import android.app.Notification
+import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.*
-import android.preference.PreferenceManager
-import com.zacharee1.boredsigns.widgets.InfoWidget
-import android.appwidget.AppWidgetManager
-import android.content.Intent
-import android.content.ComponentName
-import android.graphics.drawable.Icon
 import android.net.ConnectivityManager
 import android.net.wifi.WifiManager
+import android.os.Build
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
+import android.support.v4.app.NotificationCompat
 import android.telephony.PhoneStateListener
 import android.telephony.SignalStrength
 import android.telephony.TelephonyManager
-import android.util.Log
 import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.util.Utils
+import com.zacharee1.boredsigns.widgets.InfoWidget
 
 
 class InfoService : NotificationListenerService() {
@@ -109,10 +106,15 @@ class InfoService : NotificationListenerService() {
     override fun onCreate() {
         super.onCreate()
 
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
+            val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            nm.createNotificationChannel(NotificationChannel("boredsigns", resources.getText(R.string.app_name), NotificationManager.IMPORTANCE_LOW))
+        }
+
         startForeground(1337,
-                Notification.Builder(this)
+                NotificationCompat.Builder(this, "boredsigns")
                         .setSmallIcon(R.mipmap.ic_launcher_boredsigns)
-                        .setPriority(Notification.PRIORITY_MIN)
+                        .setPriority(NotificationCompat.PRIORITY_MIN)
                         .build())
 
         if (!shouldAct()) {

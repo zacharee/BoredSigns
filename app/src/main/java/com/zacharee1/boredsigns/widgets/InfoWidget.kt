@@ -129,7 +129,7 @@ class InfoWidget : AppWidgetProvider() {
         }
 
         if (intent?.action == Intent.ACTION_TIME_TICK) {
-            val pm = context?.getSystemService(Context.POWER_SERVICE) as PowerManager
+            val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
             if (!pm.isInteractive) {
                 Utils.sendWidgetUpdate(context, this@InfoWidget::class.java, null)
             }
