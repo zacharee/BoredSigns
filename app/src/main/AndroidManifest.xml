@@ -22,8 +22,6 @@
         android:name="android.hardware.location.gps"
         android:required="false" />
 
-    <!-- IMPORTANT!! -->
-    <!-- Remove the android:name attribute below before attempting to build! -->
     <application
         android:name=".App"
         android:allowBackup="true"

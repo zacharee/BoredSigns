@@ -10,7 +10,6 @@ import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.os.Bundle
 import android.text.Html
 import android.util.TypedValue
@@ -21,16 +20,9 @@ import java.io.InputStreamReader
 
 
 object Utils {
-    val compatibleDevices = arrayListOf(
-            "elsa",
-            "pplus",
-            "anna",
-            "l-01j"
-    )
-
     fun checkCompatibility(context: Context): Boolean {
-        return compatibleDevices.contains(Build.DEVICE.toLowerCase())
-                && isPackageInstalled(context, "com.lge.signboard")
+        return isPackageInstalled(context, "com.lge.signboard")
+                || isPackageInstalled(context, "com.zacharee1.aospsignboard")
     }
 
     fun isPackageInstalled(context: Context, pkg: String): Boolean {
