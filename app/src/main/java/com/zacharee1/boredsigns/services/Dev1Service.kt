@@ -1,15 +1,20 @@
 package com.zacharee1.boredsigns.services
 
 import android.app.ActivityManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.BatteryManager
+import android.os.Build
 import android.os.IBinder
+import android.support.v4.app.NotificationCompat
 import android.view.Choreographer
 import android.view.WindowManager
 import com.codemonkeylabs.fpslibrary.Calculation
 import com.codemonkeylabs.fpslibrary.FPSConfig
+import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.util.Utils
 import com.zacharee1.boredsigns.widgets.Dev1Widget
 
@@ -29,6 +34,7 @@ class Dev1Service : Service() {
     }
 
     override fun onCreate() {
+        startForeground()
         choreographer = Choreographer.getInstance()
 
         val config = object : FPSConfig() {}
@@ -44,8 +50,22 @@ class Dev1Service : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-
+        stopForeground(true)
         choreographer.removeFrameCallback(callback)
+    }
+
+    private fun startForeground() {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(NotificationChannel("dev1",
+                    resources.getString(R.string.dev_widget_1_title), NotificationManager.IMPORTANCE_LOW))
+        }
+
+        startForeground(1337,
+                NotificationCompat.Builder(this, "dev1")
+                        .setSmallIcon(R.mipmap.ic_launcher_boredsigns)
+                        .setPriority(NotificationCompat.PRIORITY_MIN)
+                        .build())
     }
 
     private fun startListening() {

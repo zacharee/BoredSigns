@@ -3,18 +3,18 @@ package com.zacharee1.boredsigns.services
 import android.Manifest
 import android.annotation.RequiresPermission
 import android.annotation.SuppressLint
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.app.Service
+import android.app.*
 import android.content.*
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.os.SystemClock
 import android.preference.PreferenceManager
+import android.support.v4.app.NotificationCompat
 import android.support.v4.content.LocalBroadcastManager
 import android.widget.Toast
 import com.google.android.gms.common.api.ApiException
@@ -95,6 +95,8 @@ class WeatherService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+
+        startForeground()
         prefs = PreferenceManager.getDefaultSharedPreferences(this)
         alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
@@ -141,9 +143,24 @@ class WeatherService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        stopForeground(true)
         stopLocationUpdates()
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
         alarmManager.cancel(alarmIntent)
+    }
+
+    private fun startForeground() {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(NotificationChannel("weather",
+                    resources.getString(R.string.weather_widget_title), NotificationManager.IMPORTANCE_LOW))
+        }
+
+        startForeground(1337,
+                NotificationCompat.Builder(this, "weather")
+                        .setSmallIcon(R.mipmap.ic_launcher_boredsigns)
+                        .setPriority(NotificationCompat.PRIORITY_MIN)
+                        .build())
     }
 
     private fun onHandleIntent(action: String?) {

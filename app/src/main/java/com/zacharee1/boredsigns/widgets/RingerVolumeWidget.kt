@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
 import android.provider.Settings
+import android.support.v4.content.ContextCompat
 import android.widget.RemoteViews
 import android.widget.Toast
 import com.zacharee1.boredsigns.R
@@ -15,7 +16,7 @@ import com.zacharee1.boredsigns.services.VolumeService
 
 class RingerVolumeWidget : AppWidgetProvider() {
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        context.startService(Intent(context, VolumeService::class.java))
+        ContextCompat.startForegroundService(context, Intent(context, VolumeService::class.java))
 
         val notifMan = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (!notifMan.isNotificationPolicyAccessGranted) {

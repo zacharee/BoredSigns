@@ -108,11 +108,11 @@ class InfoService : NotificationListenerService() {
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
             val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            nm.createNotificationChannel(NotificationChannel("boredsigns", resources.getText(R.string.app_name), NotificationManager.IMPORTANCE_LOW))
+            nm.createNotificationChannel(NotificationChannel("info", resources.getText(R.string.info_widget_title), NotificationManager.IMPORTANCE_LOW))
         }
 
         startForeground(1337,
-                NotificationCompat.Builder(this, "boredsigns")
+                NotificationCompat.Builder(this, "info")
                         .setSmallIcon(R.mipmap.ic_launcher_boredsigns)
                         .setPriority(NotificationCompat.PRIORITY_MIN)
                         .build())

@@ -4,15 +4,14 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
+import android.support.v4.content.ContextCompat
 import android.widget.RemoteViews
-
 import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.services.Dev2Service
-import com.zacharee1.boredsigns.util.Utils
 
 class Dev2Widget : AppWidgetProvider() {
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        context.startService(Intent(context, Dev2Service::class.java))
+        ContextCompat.startForegroundService(context, Intent(context, Dev2Service::class.java))
 
         val views = RemoteViews(context.packageName, R.layout.dev2_widget)
 

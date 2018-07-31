@@ -6,13 +6,14 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
+import android.support.v4.content.ContextCompat
 import android.widget.RemoteViews
 import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.services.VolumeService
 
 class MediaVolumeWidget : AppWidgetProvider() {
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        context.startService(Intent(context, VolumeService::class.java))
+        ContextCompat.startForegroundService(context, Intent(context, VolumeService::class.java))
 
         val views = RemoteViews(context.packageName, R.layout.volume_widget_layout)
         val audioMan = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager

@@ -4,14 +4,17 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
+import android.support.v4.content.ContextCompat
 import android.widget.RemoteViews
 import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.services.CPUInfoService
 import com.zacharee1.boredsigns.util.Utils
 
 class CPUInfoWidget : AppWidgetProvider() {
+    private var enabled = false
+
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        context.startService(Intent(context, CPUInfoService::class.java))
+        if (enabled) ContextCompat.startForegroundService(context, Intent(context, CPUInfoService::class.java))
 
         val views = RemoteViews(context.packageName, R.layout.cpu_widget)
         views.removeAllViews(R.id.content)
@@ -33,14 +36,18 @@ class CPUInfoWidget : AppWidgetProvider() {
         appWidgetManager.updateAppWidget(appWidgetIds, views)
     }
 
+    override fun onEnabled(context: Context?) {
+        enabled = true
+    }
+
     override fun onDisabled(context: Context?) {
-        super.onDisabled(context)
+        enabled = false
 
         context?.stopService(Intent(context, CPUInfoService::class.java))
     }
 
     override fun onDeleted(context: Context?, appWidgetIds: IntArray?) {
-        super.onDeleted(context, appWidgetIds)
+        enabled = false
 
         context?.stopService(Intent(context, CPUInfoService::class.java))
     }

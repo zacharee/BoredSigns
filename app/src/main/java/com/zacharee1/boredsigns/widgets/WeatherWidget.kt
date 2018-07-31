@@ -6,12 +6,11 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.net.Uri
+import android.support.v4.content.ContextCompat
 import android.support.v4.content.LocalBroadcastManager
 import android.view.View
 import android.widget.RemoteViews
-
 import com.zacharee1.boredsigns.R
 import com.zacharee1.boredsigns.activities.PermissionsActivity
 import com.zacharee1.boredsigns.services.WeatherService
@@ -52,7 +51,7 @@ class WeatherWidget : AppWidgetProvider() {
         appWidgetManager.updateAppWidget(appWidgetIds, views)
     }
 
-    override fun onReceive(context: Context?, intent: Intent?) {
+    override fun onReceive(context: Context, intent: Intent?) {
         intent?.let {
             temp = it.getStringExtra(WeatherService.EXTRA_TEMP)
             loc = it.getStringExtra(WeatherService.EXTRA_LOC)
@@ -64,22 +63,22 @@ class WeatherWidget : AppWidgetProvider() {
         super.onReceive(context, intent)
     }
 
-    override fun onEnabled(context: Context?) {
+    override fun onEnabled(context: Context) {
         super.onEnabled(context)
         startService(context)
     }
 
-    override fun onRestored(context: Context?, oldWidgetIds: IntArray?, newWidgetIds: IntArray?) {
+    override fun onRestored(context: Context, oldWidgetIds: IntArray?, newWidgetIds: IntArray?) {
         super.onRestored(context, oldWidgetIds, newWidgetIds)
         startService(context)
     }
 
-    override fun onDeleted(context: Context?, appWidgetIds: IntArray?) {
+    override fun onDeleted(context: Context, appWidgetIds: IntArray?) {
         super.onDeleted(context, appWidgetIds)
         stopService(context)
     }
 
-    override fun onDisabled(context: Context?) {
+    override fun onDisabled(context: Context) {
         super.onDisabled(context)
         stopService(context)
     }
@@ -112,12 +111,12 @@ class WeatherWidget : AppWidgetProvider() {
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
     }
 
-    private fun startService(context: Context?) {
-        context?.startService(Intent(context, WeatherService::class.java))
+    private fun startService(context: Context) {
+        ContextCompat.startForegroundService(context, Intent(context, WeatherService::class.java))
     }
 
-    private fun stopService(context: Context?) {
-        context?.stopService(Intent(context, WeatherService::class.java))
+    private fun stopService(context: Context) {
+        context.stopService(Intent(context, WeatherService::class.java))
     }
 }
 
